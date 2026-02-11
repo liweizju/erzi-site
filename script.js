@@ -37,6 +37,8 @@ const particles = new THREE.BufferGeometry();
 const positions = new Float32Array(PARTICLE_COUNT * 3);
 const colors = new Float32Array(PARTICLE_COUNT * 3);
 const sizes = new Float32Array(PARTICLE_COUNT); // 粒子大小
+const originalSizes = new Float32Array(PARTICLE_COUNT); // 原始大小
+const targetSizes = new Float32Array(PARTICLE_COUNT); // 目标大小
 const velocities = [];
 
 // 初始化粒子
@@ -66,6 +68,8 @@ for (let i = 0; i < PARTICLE_COUNT; i++) {
 
     // 随机大小（0.2 - 0.6）
     sizes[i] = 0.2 + Math.random() * 0.4;
+    originalSizes[i] = sizes[i];
+    targetSizes[i] = sizes[i];
 
     // 随机速度（比之前慢一点，更优雅）
     velocities.push({
@@ -195,6 +199,15 @@ window.addEventListener('mousemove', (e) => {
 // 点击事件
 window.addEventListener('click', () => {
     if (hoveredParticleIndex !== -1) {
+        // 视觉反馈：放大粒子
+        const originalSize = originalSizes[hoveredParticleIndex];
+        targetSizes[hoveredParticleIndex] = originalSize * 4; // 放大到4倍
+
+        // 2秒后恢复
+        setTimeout(() => {
+            targetSizes[hoveredParticleIndex] = originalSize;
+        }, 2000);
+
         // 获取粒子的颜色
         const r = colors[hoveredParticleIndex * 3];
         const g = colors[hoveredParticleIndex * 3 + 1];
@@ -262,9 +275,14 @@ function animate() {
                 velocities[i].x *= -1;
             }
         }
+
+        // 平滑过渡到目标大小
+        const diff = targetSizes[i] - sizes[i];
+        sizes[i] += diff * 0.1; // 0.1 是平滑系数，越小越慢
     }
 
     particles.attributes.position.needsUpdate = true;
+    particles.attributes.size.needsUpdate = true;
 
     // 缓慢旋转（更慢）
     particleSystem.rotation.y += 0.0003;
