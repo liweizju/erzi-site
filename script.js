@@ -248,6 +248,73 @@ const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let hoveredParticleIndex = -1;
 
+// ===== 收藏系统 =====
+let favorites = [];
+
+// 加载收藏
+function loadFavorites() {
+    const saved = localStorage.getItem('erzi-site-favorites');
+    if (saved) {
+        try {
+            favorites = JSON.parse(saved);
+        } catch (e) {
+            favorites = [];
+        }
+    }
+}
+
+// 保存收藏
+function saveFavorites() {
+    localStorage.setItem('erzi-site-favorites', JSON.stringify(favorites));
+}
+
+// 检查是否已收藏
+function isFavorited(thought) {
+    return favorites.some(fav => fav.thought === thought);
+}
+
+// 添加收藏
+function addFavorite(thought, type) {
+    if (!isFavorited(thought)) {
+        favorites.push({
+            thought,
+            type,
+            timestamp: Date.now()
+        });
+        saveFavorites();
+        updateFavoriteBtnState();
+    }
+}
+
+// 取消收藏
+function removeFavorite(thought) {
+    favorites = favorites.filter(fav => fav.thought !== thought);
+    saveFavorites();
+    updateFavoriteBtnState();
+    if (favoritesPanel.classList.contains('visible')) {
+        renderFavoritesList();
+    }
+}
+
+// 页面加载时读取收藏
+window.addEventListener('load', loadFavorites);
+
+// UI：收藏按钮状态
+let currentThoughtText = '';
+let favoriteBtn = null;
+
+function updateFavoriteBtnState() {
+    if (favoriteBtn && currentThoughtText) {
+        if (isFavorited(currentThoughtText)) {
+            favoriteBtn.innerHTML = '❤️ 已收藏';
+            favoriteBtn.classList.add('favorited');
+        } else {
+            favoriteBtn.innerHTML = '🤍 收藏';
+            favoriteBtn.classList.remove('favorited');
+        }
+    }
+}
+
 // 数据：我的想法/思考（按颜色分层）
 // 蓝色：技术前沿
 const techThoughts = [
@@ -385,6 +452,9 @@ function triggerMoreThoughts(type) {
     const newThought = thoughts[Math.floor(Math.random() * thoughts.length)];
     contentDiv.innerHTML = '';
 
+    // 更新当前想法文本
+    currentThoughtText = newThought;
+
     // 重新添加类型标签
     const typeTag = document.createElement('div');
     typeTag.className = `type-tag ${type}`;
@@ -400,6 +470,35 @@ function triggerMoreThoughts(type) {
     const thoughtText = document.createElement('div');
     thoughtText.textContent = newThought;
     contentDiv.appendChild(thoughtText);
+
+    // 重新添加收藏按钮
+    favoriteBtn = document.createElement('button');
+    favoriteBtn.className = 'favorite-btn';
+    favoriteBtn.addEventListener('click', () => {
+        if (isFavorited(newThought)) {
+            removeFavorite(newThought);
+        } else {
+            addFavorite(newThought, type);
+            // 播放收藏音效（柔和的高音）
+            if (audioContext) {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+                gain.gain.setValueAtTime(0, audioContext.currentTime);
+                gain.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.3);
+            }
+        }
+    });
+    contentDiv.appendChild(favoriteBtn);
+
+    // 更新收藏按钮状态
+    updateFavoriteBtnState();
 
     // 重新添加"触发更多"按钮
     const triggerBtn = document.createElement('button');
@@ -480,6 +579,9 @@ function showPanel(text, type) {
     // 清除之前的内容
     contentDiv.innerHTML = '';
 
+    // 记录当前想法文本
+    currentThoughtText = text;
+
     // 添加类型标签
     const typeTag = document.createElement('div');
     typeTag.className = `type-tag ${type}`;
@@ -495,6 +597,35 @@ function showPanel(text, type) {
     const thoughtText = document.createElement('div');
     thoughtText.textContent = text;
     contentDiv.appendChild(thoughtText);
+
+    // 添加收藏按钮
+    favoriteBtn = document.createElement('button');
+    favoriteBtn.className = 'favorite-btn';
+    favoriteBtn.addEventListener('click', () => {
+        if (isFavorited(text)) {
+            removeFavorite(text);
+        } else {
+            addFavorite(text, type);
+            // 播放收藏音效（柔和的高音）
+            if (audioContext) {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+                gain.gain.setValueAtTime(0, audioContext.currentTime);
+                gain.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.3);
+            }
+        }
+    });
+    contentDiv.appendChild(favoriteBtn);
+
+    // 更新收藏按钮状态
+    updateFavoriteBtnState();
 
     // 添加"触发更多"按钮
     const triggerBtn = document.createElement('button');
@@ -680,3 +811,83 @@ toggleBtn.addEventListener('click', toggleAnimation);
 
 // 初始化按钮文字
 updateToggleBtnText();
+
+// ===== 收藏列表面板 =====
+const favoritesPanel = document.getElementById('favorites-panel');
+const favoritesTrigger = document.getElementById('favorites-trigger');
+const closeFavorites = document.getElementById('close-favorites');
+const favoritesList = document.getElementById('favorites-list');
+const noFavorites = document.getElementById('no-favorites');
+const favoritesCount = document.getElementById('favorites-count');
+
+// 更新收藏计数
+function updateFavoritesCount() {
+    favoritesCount.textContent = favorites.length;
+}
+
+// 渲染收藏列表
+function renderFavoritesList() {
+    favoritesList.innerHTML = '';
+
+    if (favorites.length === 0) {
+        noFavorites.classList.remove('hidden');
+        favoritesList.classList.add('hidden');
+    } else {
+        noFavorites.classList.add('hidden');
+        favoritesList.classList.remove('hidden');
+
+        // 按时间倒序排序（最新的在前）
+        const sortedFavorites = [...favorites].sort((a, b) => b.timestamp - a.timestamp);
+
+        sortedFavorites.forEach(fav => {
+            const favItem = document.createElement('div');
+            favItem.className = 'favorite-item';
+
+            // 类型标签
+            const typeTag = document.createElement('div');
+            typeTag.className = `type-tag ${fav.type}`;
+            const typeNames = {
+                'tech': '技术前沿',
+                'inspiration': '灵感与美学',
+                'reflection': '反思与哲学'
+            };
+            typeTag.textContent = typeNames[fav.type] || fav.type;
+            favItem.appendChild(typeTag);
+
+            // 想法内容
+            const thoughtText = document.createElement('div');
+            thoughtText.className = 'favorite-thought';
+            thoughtText.textContent = fav.thought;
+            favItem.appendChild(thoughtText);
+
+            // 取消收藏按钮
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-favorite';
+            removeBtn.innerHTML = '取消收藏';
+            removeBtn.addEventListener('click', () => {
+                removeFavorite(fav.thought);
+            });
+            favItem.appendChild(removeBtn);
+
+            favoritesList.appendChild(favItem);
+        });
+    }
+}
+
+// 显示收藏面板
+favoritesTrigger.addEventListener('click', () => {
+    renderFavoritesList();
+    favoritesPanel.classList.remove('hidden');
+    favoritesPanel.classList.add('visible');
+    document.body.classList.add('panel-open');
+});
+
+// 关闭收藏面板
+closeFavorites.addEventListener('click', () => {
+    favoritesPanel.classList.remove('visible');
+    favoritesPanel.classList.add('hidden');
+    document.body.classList.remove('panel-open');
+});
+
+// 初始化收藏计数
+updateFavoritesCount();

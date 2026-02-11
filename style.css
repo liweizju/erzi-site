@@ -72,6 +72,44 @@ body.panel-open #canvas {
     transform: scale(0.95);
 }
 
+/* 收藏图标入口 */
+.favorites-trigger {
+    position: fixed;
+    top: 5rem;
+    right: 2rem;
+    background: rgba(118, 75, 162, 0.15);
+    border: 1px solid rgba(118, 75, 162, 0.3);
+    color: #764ba2;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.favorites-trigger:hover {
+    background: rgba(118, 75, 162, 0.25);
+    border-color: rgba(118, 75, 162, 0.5);
+    transform: scale(1.05);
+}
+
+.favorites-trigger:active {
+    transform: scale(0.95);
+}
+
+#favorites-count {
+    background: rgba(118, 75, 162, 0.3);
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
 /* Header */
 header {
     text-align: left;
@@ -188,6 +226,40 @@ h1 {
     transform: translateY(0);
 }
 
+/* 收藏按钮 */
+.favorite-btn {
+    width: 100%;
+    background: rgba(236, 72, 153, 0.1);
+    border: 1px solid rgba(236, 72, 153, 0.3);
+    color: #ec4899;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.favorite-btn:hover {
+    background: rgba(236, 72, 153, 0.2);
+    border-color: rgba(236, 72, 153, 0.5);
+    transform: translateY(-2px);
+}
+
+.favorite-btn:active {
+    transform: translateY(0);
+}
+
+.favorite-btn.favorited {
+    background: rgba(236, 72, 153, 0.25);
+    border-color: rgba(236, 72, 153, 0.5);
+    color: #ec4899;
+}
+
 .close-btn {
     position: absolute;
     top: 0.5rem;
@@ -203,6 +275,138 @@ h1 {
 
 .close-btn:hover {
     opacity: 1;
+}
+
+/* 收藏列表面板 */
+#favorites-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(20px);
+    background: rgba(20, 20, 30, 0.98);
+    border: 1px solid rgba(118, 75, 162, 0.4);
+    border-radius: 12px;
+    padding: 2.5rem 2rem 2rem 2rem;
+    max-width: 90%;
+    width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(118, 75, 162, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+}
+
+#favorites-panel.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -50%) translateY(20px) scale(0.9);
+}
+
+#favorites-panel.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+}
+
+#favorites-panel h2 {
+    font-size: 1.3rem;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    color: #764ba2;
+    text-align: center;
+}
+
+#favorites-panel .type-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+#favorites-panel .type-tag.tech {
+    background: rgba(102, 126, 234, 0.2);
+    color: #667eea;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+#favorites-panel .type-tag.inspiration {
+    background: rgba(118, 75, 162, 0.2);
+    color: #764ba2;
+    border: 1px solid rgba(118, 75, 162, 0.3);
+}
+
+#favorites-panel .type-tag.reflection {
+    background: rgba(72, 187, 120, 0.2);
+    color: #48bb78;
+    border: 1px solid rgba(72, 187, 120, 0.3);
+}
+
+.favorite-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.favorite-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(118, 75, 162, 0.2);
+    transform: translateX(4px);
+}
+
+.favorite-thought {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #e8e8f0;
+    margin-bottom: 0.8rem;
+}
+
+.remove-favorite {
+    background: rgba(236, 72, 153, 0.15);
+    border: 1px solid rgba(236, 72, 153, 0.3);
+    color: #ec4899;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.remove-favorite:hover {
+    background: rgba(236, 72, 153, 0.25);
+    border-color: rgba(236, 72, 153, 0.5);
+}
+
+#no-favorites {
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+    padding: 2rem 0;
+}
+
+#favorites-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+#favorites-panel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+#favorites-panel::-webkit-scrollbar-thumb {
+    background: rgba(118, 75, 162, 0.3);
+    border-radius: 3px;
+}
+
+#favorites-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(118, 75, 162, 0.5);
 }
 
 /* Footer */
