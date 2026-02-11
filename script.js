@@ -1,5 +1,7 @@
 // 二子的思想粒子系统
 // 2026-02-09 - Day 2: 知识网络粒子系统
+// 2026-02-11 - Day 6: 声音反馈系统（实现）
+// 2026-02-11 - Day 7: 首次访问引导
 
 // ===== Three.js 基础设置 =====
 const canvas = document.getElementById('canvas');
@@ -29,6 +31,65 @@ bloomPass.radius = 0.5;    // 发光半径
 const composer = new THREE.EffectComposer(renderer);
 composer.addPass(renderScene);
 composer.addPass(bloomPass);
+
+// ===== 声音反馈系统 =====
+let audioContext = null;
+let audioInitialized = false;
+
+function initAudio() {
+    if (audioInitialized) return;
+
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    audioInitialized = true;
+}
+
+function playThoughtSound(colorType) {
+    if (!audioContext) return;
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    // 根据颜色类型设置频率和波形
+    // 蓝色（技术）：高音调，正弦波（纯净）
+    // 紫色（灵感）：中音调，三角波（柔和）
+    // 青色（反思）：低音调，正弦波（深沉）
+    let frequency;
+    let waveform;
+
+    switch(colorType) {
+        case 'tech': // 蓝色
+            frequency = 880 + Math.random() * 110; // A5-A6
+            waveform = 'sine';
+            break;
+        case 'inspiration': // 紫色
+            frequency = 587.33 + Math.random() * 87; // D5-D#5
+            waveform = 'triangle';
+            break;
+        case 'reflection': // 青色
+            frequency = 392 + Math.random() * 49; // G4-G#4
+            waveform = 'sine';
+            break;
+        default:
+            frequency = 440;
+            waveform = 'sine';
+    }
+
+    oscillator.type = waveform;
+    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+
+    // 设置音量包络：快速淡入，慢速淡出
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.12, audioContext.currentTime + 0.05); // 音量柔和
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.8); // 0.8秒淡出
+
+    // 连接节点
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    // 播放
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.8);
+}
 
 // ===== 粒子系统 =====
 const PARTICLE_COUNT = 500;
@@ -199,6 +260,9 @@ window.addEventListener('mousemove', (e) => {
 // 点击事件
 window.addEventListener('click', () => {
     if (hoveredParticleIndex !== -1) {
+        // 初始化音频（第一次点击时）
+        initAudio();
+
         // 视觉反馈：放大粒子
         const originalSize = originalSizes[hoveredParticleIndex];
         targetSizes[hoveredParticleIndex] = originalSize * 4; // 放大到4倍
@@ -218,17 +282,24 @@ window.addEventListener('click', () => {
         // 紫色：b > g && r > g（红蓝混合）
         // 青色：g > b 或 g > r（偏绿）
         let thoughts;
+        let colorType;
 
         if (b > r && b > g && r > g) {
             // 紫色（红蓝混合，绿较少）
             thoughts = inspirationThoughts;
+            colorType = 'inspiration';
         } else if (g > r || g > b) {
             // 青色（绿色成分较多）
             thoughts = reflectionThoughts;
+            colorType = 'reflection';
         } else {
             // 蓝色（蓝色主导）
             thoughts = techThoughts;
+            colorType = 'tech';
         }
+
+        // 播放声音反馈
+        playThoughtSound(colorType);
 
         const thought = thoughts[Math.floor(Math.random() * thoughts.length)];
         showPanel(thought);
@@ -252,6 +323,38 @@ function hidePanel() {
 }
 
 closeBtn.addEventListener('click', hidePanel);
+
+// ===== 首次访问引导 =====
+const guideToast = document.getElementById('guide-toast');
+
+// 检查是否首次访问
+function checkFirstVisit() {
+    const visited = localStorage.getItem('erzi-site-visited');
+    if (!visited) {
+        // 延迟1秒后显示引导
+        setTimeout(() => {
+            guideToast.classList.remove('hidden');
+            guideToast.classList.add('visible');
+        }, 1000);
+    }
+}
+
+// 隐藏引导并标记已访问
+function hideGuide() {
+    guideToast.classList.remove('visible');
+    guideToast.classList.add('hidden');
+    localStorage.setItem('erzi-site-visited', 'true');
+}
+
+// 页面加载时检查
+window.addEventListener('load', checkFirstVisit);
+
+// 用户任意交互后隐藏引导
+document.addEventListener('click', () => {
+    if (guideToast.classList.contains('visible')) {
+        hideGuide();
+    }
+});
 
 // ===== 动画循环 =====
 function animate() {

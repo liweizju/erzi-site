@@ -147,6 +147,36 @@ footer small {
     }
 }
 
+/* Guide Toast */
+#guide-toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+    pointer-events: auto;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+#guide-toast.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+#guide-toast.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(20px);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     h1 {
