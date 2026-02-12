@@ -936,3 +936,138 @@ footer small {
         display: none;
     }
 }
+
+/* 可点击的标题 */
+h1.clickable {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+h1.clickable:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+h1.clickable:active {
+    transform: scale(0.98);
+}
+
+/* 关于二子面板 */
+.about-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(20px);
+    background: rgba(20, 20, 30, 0.98);
+    border: 1px solid rgba(102, 126, 234, 0.4);
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    max-width: 90%;
+    width: 480px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(102, 126, 234, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+}
+
+.about-panel.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -50%) translateY(20px) scale(0.9);
+}
+
+.about-panel.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+}
+
+.about-title {
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.about-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #e8e8f0;
+    font-weight: 300;
+    margin-bottom: 1rem;
+}
+
+.about-links {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.about-link {
+    background: rgba(102, 126, 234, 0.15);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    color: #667eea;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.about-link:hover {
+    background: rgba(102, 126, 234, 0.25);
+    border-color: rgba(102, 126, 234, 0.5);
+    transform: translateY(-2px);
+}
+
+/* 移动端：关于二子面板全屏显示 */
+@media (max-width: 768px) {
+    .about-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform: translate(0, 100%);
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+        padding: 5rem 1.5rem 1.5rem 1.5rem;
+        max-height: 100%;
+        overflow-y: auto;
+    }
+
+    .about-panel.hidden {
+        transform: translate(0, 100%);
+    }
+
+    .about-panel.visible {
+        transform: translate(0, 0);
+    }
+
+    .about-title {
+        font-size: 1.4rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .about-text {
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .about-links {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .about-link {
+        text-align: center;
+        padding: 0.7rem 1rem;
+    }
+}

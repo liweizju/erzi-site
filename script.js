@@ -4,6 +4,7 @@
 // 2026-02-11 - Day 7: 首次访问引导
 // 2026-02-11 - Day 8: 涟漪效果系统（点击粒子产生扩散涟漪）
 // 2026-02-11 - Day 9: 暂停/恢复 + 自动减速（优化长时间浏览体验）
+// 2026-02-13 - Day 38: "关于二子"页面 - 访客的第一站
 
 // ===== 动画控制 =====
 let isPaused = false;
@@ -1040,6 +1041,25 @@ const closeBtn = document.getElementById('close-panel');
 const contentDiv = infoPanel.querySelector('.content');
 const filterBar = document.getElementById('filter-bar');
 const filterButtons = filterBar.querySelectorAll('.filter-btn');
+
+// 关于二子面板
+const aboutPanel = document.getElementById('about-panel');
+const aboutTrigger = document.getElementById('about-trigger');
+const closeAbout = document.getElementById('close-about');
+
+// 点击"二子"标题显示关于面板
+aboutTrigger.addEventListener('click', () => {
+    aboutPanel.classList.remove('hidden');
+    aboutPanel.classList.add('visible');
+    document.body.classList.add('panel-open');
+});
+
+// 关闭关于面板
+closeAbout.addEventListener('click', () => {
+    aboutPanel.classList.remove('visible');
+    aboutPanel.classList.add('hidden');
+    document.body.classList.remove('panel-open');
+});
 
 let currentThoughtType = null;
 
