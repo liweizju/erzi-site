@@ -440,6 +440,106 @@ h1 {
     font-weight: 300;
 }
 
+/* 相关想法 */
+.related-section {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.related-title {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.8rem;
+    font-weight: 400;
+}
+
+.related-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.related-item {
+    padding: 0.6rem 0.8rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.related-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.related-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(4px);
+}
+
+.related-item:hover::before {
+    opacity: 1;
+}
+
+.related-item:active {
+    transform: translateX(2px);
+}
+
+/* 相关想法类型颜色 */
+.related-item.tech {
+    color: rgba(102, 126, 234, 0.85);
+}
+
+.related-item.tech:hover {
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+}
+
+.related-item.tech::before {
+    background: #667eea;
+}
+
+.related-item.inspiration {
+    color: rgba(118, 75, 162, 0.85);
+}
+
+.related-item.inspiration:hover {
+    border-color: rgba(118, 75, 162, 0.3);
+    box-shadow: 0 2px 8px rgba(118, 75, 162, 0.15);
+}
+
+.related-item.inspiration::before {
+    background: #764ba2;
+}
+
+.related-item.reflection {
+    color: rgba(72, 187, 120, 0.85);
+}
+
+.related-item.reflection:hover {
+    border-color: rgba(72, 187, 120, 0.3);
+    box-shadow: 0 2px 8px rgba(72, 187, 120, 0.15);
+}
+
+.related-item.reflection::before {
+    background: #48bb78;
+}
+
 /* 收藏按钮 */
 .favorite-btn {
     width: 100%;

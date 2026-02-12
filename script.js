@@ -814,6 +814,101 @@ function triggerMoreThoughts(type) {
     playThoughtSound(displayType);
 }
 
+// 提取关键词（简单分词）
+function extractKeywords(text) {
+    // 常见停用词
+    const stopWords = ['的', '是', '在', '有', '和', '与', '等', '从', '到', '了', '将', '为', '以', '了', '会', '能', '让', '用', '这', '那', '此', '其', '之', '而', '或', '但', '却', '如', '若', '因', '故', '则', '即', '及', '乃', '亦', '非', '无', '未', '可', '应', '需', '当', '时', '后', '前', '中', '间', '内', '外', '上', '下', '左', '右', '大', '小', '多', '少', '新', '旧', '好', '坏', '对', '错', '真', '假', '有', '无', '了', '呢', '吗', '啊', '吧'];
+
+    // 提取 2-4 字的词
+    const words = [];
+    const regex = /[\u4e00-\u9fa5]{2,4}/g;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+        const word = match[0];
+        // 排除停用词
+        if (!stopWords.includes(word)) {
+            words.push(word);
+        }
+    }
+
+    // 统计词频，取前 5 个高频词
+    const wordCount = {};
+    words.forEach(word => {
+        wordCount[word] = (wordCount[word] || 0) + 1;
+    });
+
+    // 按词频排序
+    const sortedWords = Object.entries(wordCount)
+        .sort((a, b) => b[1] - a[1])
+        .map(([word, count]) => word);
+
+    // 取前 5 个关键词
+    return sortedWords.slice(0, 5);
+}
+
+// 查找相关想法
+function findRelatedThoughts(currentThought, currentType, count = 3) {
+    // 获取所有想法
+    const allThoughts = {
+        'tech': techThoughts,
+        'inspiration': inspirationThoughts,
+        'reflection': reflectionThoughts
+    };
+
+    // 提取当前想法的关键词
+    const keywords = extractKeywords(currentThought);
+
+    if (keywords.length === 0) {
+        return [];
+    }
+
+    // 在所有想法中搜索包含关键词的想法
+    const related = [];
+
+    for (const type of ['tech', 'inspiration', 'reflection']) {
+        for (const thought of allThoughts[type]) {
+            // 排除当前想法本身
+            if (thought === currentThought) {
+                continue;
+            }
+
+            // 计算匹配的关键词数量
+            let matchCount = 0;
+            for (const keyword of keywords) {
+                if (thought.includes(keyword)) {
+                    matchCount++;
+                }
+            }
+
+            // 如果有匹配，加入结果
+            if (matchCount > 0) {
+                related.push({
+                    thought,
+                    type,
+                    matchCount
+                });
+            }
+        }
+    }
+
+    // 按匹配的关键词数量排序，优先显示同类型的想法
+    related.sort((a, b) => {
+        // 同类型的优先
+        if (a.type === currentType && b.type !== currentType) {
+            return -1;
+        }
+        if (b.type === currentType && a.type !== currentType) {
+            return 1;
+        }
+        // 匹配数多的优先
+        return b.matchCount - a.matchCount;
+    });
+
+    // 返回前 count 个结果
+    return related.slice(0, count);
+}
+
 // 点击事件
 window.addEventListener('click', () => {
     if (hoveredParticleIndex !== -1) {
@@ -951,6 +1046,37 @@ function showPanel(text, type) {
         // 实际上，我们可以显示一个通用的"发现于 2026-02-12"
         discoveryTime.textContent = '发现于 2026-02-12';
         contentDiv.appendChild(discoveryTime);
+    }
+
+    // 添加相关想法
+    const relatedThoughts = findRelatedThoughts(text, type);
+    if (relatedThoughts.length > 0) {
+        const relatedSection = document.createElement('div');
+        relatedSection.className = 'related-section';
+
+        const relatedTitle = document.createElement('div');
+        relatedTitle.className = 'related-title';
+        relatedTitle.textContent = '💡 相关想法';
+        relatedSection.appendChild(relatedTitle);
+
+        const relatedList = document.createElement('div');
+        relatedList.className = 'related-list';
+
+        relatedThoughts.forEach((item, index) => {
+            const relatedItem = document.createElement('div');
+            relatedItem.className = `related-item ${item.type}`;
+            relatedItem.textContent = item.thought;
+            relatedItem.addEventListener('click', () => {
+                // 播放音效
+                playThoughtSound(item.type);
+                // 显示相关想法
+                showPanel(item.thought, item.type);
+            });
+            relatedList.appendChild(relatedItem);
+        });
+
+        relatedSection.appendChild(relatedList);
+        contentDiv.appendChild(relatedSection);
     }
 
     // 记录当前类型
