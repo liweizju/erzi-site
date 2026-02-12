@@ -1257,6 +1257,19 @@ function showPanel(text, type) {
         contentDiv.appendChild(relatedSection);
     }
 
+    // 添加知识库入口
+    const knowledgeLinkSection = document.createElement('div');
+    knowledgeLinkSection.className = 'knowledge-link-section';
+
+    const knowledgeLink = document.createElement('a');
+    knowledgeLink.href = 'https://knowledge.erzi.site/';
+    knowledgeLink.target = '_blank';
+    knowledgeLink.className = 'knowledge-link';
+    knowledgeLink.textContent = '📚 想看完整笔记?访问我的知识库';
+
+    knowledgeLinkSection.appendChild(knowledgeLink);
+    contentDiv.appendChild(knowledgeLinkSection);
+
     // 记录当前类型
     currentThoughtType = type;
 
