@@ -431,6 +431,15 @@ h1 {
     transform: translateY(0);
 }
 
+/* 发现时间 */
+.discovery-time {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    margin-top: 0.8rem;
+    font-weight: 300;
+}
+
 /* 收藏按钮 */
 .favorite-btn {
     width: 100%;

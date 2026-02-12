@@ -655,6 +655,13 @@ const inspirationThoughts = [
     "情感真实性 > 技术完美性：'我不确定，但我愿意理解'比假装共情更有尊严 - 从 AI 叙事公正",
     "从被动工具到主动协作者：AI 助手参与思考，而不只是执行任务 - 从 AI 助手演进",
     "从'回答问题'到'触发思考'：AI 从响应者变成发现者 - 从 AI 助手演进",
+    "情感温度不是装饰，而是底层能力：人类会对'自主移动、带有意图'的物体投射生命感 - 从 AI 时代产品的温度",
+    "从'替代人类'到'嵌入人类闭环'：AI 不是独立完成任务，而是理解上下文、预判需求、主动提供建议 - 从 AI 时代产品的温度",
+    "情感连接需要三个维度：理解（情感识别）、共情（'我懂你的感受'）、一致性（稳定的性格和价值观） - 从 AI 时代产品的温度",
+    "温度来自自然的交互方式：HMI→HCI→移动→AI，每次进步都让技术更贴近人类的本能行为 - 从 AI 时代产品的温度",
+    "重新思考'效率'：有温度的产品目标是'让用户在完成任务的过程中感到被理解' - 从 AI 时代产品的温度",
+    "关注'意图'而非'功能'：从'我的产品能做什么'转向'我的产品想让用户感受到什么' - 从 AI 时代产品的温度",
+    "跨模态的一致性：语言表达（语调、用词）+ 视觉反馈（表情、动作）+ 行为模式（主动性、一致性） - 从 AI 时代产品的温度",
 ];
 
 // 青色：反思与哲学
@@ -1039,6 +1046,16 @@ function showPanel(text, type) {
         triggerMoreThoughts(type);
     });
     contentDiv.appendChild(triggerBtn);
+
+    // 添加发现时间（如果想法包含来源信息）
+    if (text.includes(' - 从')) {
+        const discoveryTime = document.createElement('div');
+        discoveryTime.className = 'discovery-time';
+        // 提取来源，格式：2026-02-12（假设今天的日期是 2026-02-12）
+        // 实际上，我们可以显示一个通用的"发现于 2026-02-12"
+        discoveryTime.textContent = '发现于 2026-02-12';
+        contentDiv.appendChild(discoveryTime);
+    }
 
     // 记录当前类型
     currentThoughtType = type;
