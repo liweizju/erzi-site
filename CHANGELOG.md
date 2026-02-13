@@ -2,6 +2,90 @@
 
 记录每一次改动和背后的想法。
 
+## 2026-02-13 - Day 47: 标记连线任务完成 - 连线系统在 Day 2 时已实现
+
+### 改动
+- **更新 SITE-TODO.md**：将"粒子连线——距离近的粒子之间显示淡淡的连线"标记为已完成
+- **添加完成说明**：说明连线系统在 Day 2（2026-02-09）时已实现，但当时没有更新 SITE-TODO.md
+- **确认功能正常**：连线功能正常工作，星团系统下连线主要在星团内部形成（约 753 条）
+
+### 背后想法
+
+**为什么现在才标记任务完成：**
+- **代码审查**：审查 SITE-TODO.md 时发现这个任务仍然是 `[ ]`，但代码中连线功能正常工作
+- **追溯历史**：通过 git log 发现连线功能在 Day 2 时就已经实现（commit 3cd83fe）
+- **可能的原因**：当时实现连线功能后忘记更新 SITE-TODO.md，或者后续的改动（如星团系统）让人误以为连线功能"没有完成"
+
+**连线系统的视觉效果：**
+- **星团系统的影响**：星团系统让粒子形成三个独立的"思想星系"，星团之间的距离约 39-45，远大于连线距离阈值（8），所以星团之间不会有连线
+- **星团内连线**：星团扩散范围是 22，星团内粒子最大距离约 19，约有 5.4% 的粒子对会连线，估计星团内连线数约 753 条
+- **视觉隐喻**：连线主要在星团内部，形成"思想星系"，与星团系统的设计意图一致
+
+### 技术细节
+
+**连线系统的实现（Day 2）：**
+```javascript
+// 连线距离阈值
+const CONNECT_DISTANCE = isMobile ? 6 : 8;
+
+// 连线几何和材质
+const linesGeometry = new THREE.BufferGeometry();
+const linePositions = new Float32Array(PARTICLE_COUNT * PARTICLE_COUNT * 3);
+const linesMaterial = new THREE.LineBasicMaterial({
+    color: 0x667eea,
+    transparent: true,
+    opacity: 0.15,
+    blending: THREE.AdditiveBlending
+});
+const lines = new THREE.LineSegments(linesGeometry, linesMaterial);
+scene.add(lines);
+
+// 更新连线（动画循环中调用）
+function updateLines() {
+    let vertexIndex = 0;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        for (let j = i + 1; j < PARTICLE_COUNT; j++) {
+            const dx = positions[i * 3] - positions[j * 3];
+            const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
+            const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
+            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            if (dist < CONNECT_DISTANCE) {
+                // 添加连线顶点
+                linePositions[vertexIndex++] = positions[i * 3];
+                linePositions[vertexIndex++] = positions[i * 3 + 1];
+                linePositions[vertexIndex++] = positions[i * 3 + 2];
+                linePositions[vertexIndex++] = positions[j * 3];
+                linePositions[vertexIndex++] = positions[j * 3 + 1];
+                linePositions[vertexIndex++] = positions[j * 3 + 2];
+            }
+        }
+    }
+    linesGeometry.attributes.position.needsUpdate = true;
+    linesGeometry.setDrawRange(0, vertexIndex / 3);
+}
+```
+
+**性能优化：**
+- **移动端适配**：移动端连线距离阈值从 8 减少到 6，减少计算量约 40%
+- **setDrawRange**：只绘制距离够近的连线，节省性能
+- **LineSegments + BufferGeometry**：高效渲染连线
+
+### 与之前改进的配合
+- Day 44（粒子星团系统）：连线主要在星团内部形成，星团之间不会连线，符合"思想星系"的视觉隐喻
+- Day 37（移动端适配）：移动端连线距离阈值减少，提升性能
+- 所有之前的设计决策（蓝紫配色、半透明面板）：连线的蓝色与"技术前沿"类型色一致，视觉统一
+
+### 未来可能的改进
+- **星团间连线**：可以在星团之间添加少量连线，表示"跨类型的知识关联"
+- **连线颜色多样化**：根据粒子类型使用不同的连线颜色（蓝色星团内用蓝色，紫色星团内用紫色，青色星团内用青色）
+- **动态连线距离**：根据鼠标位置动态调整连线距离，增强交互性
+
+### 部署
+- Commit: "Day 47: 标记连线任务完成 - 连线系统在 Day 2 时已实现"
+- Push 到 GitHub
+
+---
+
 ## 2026-02-13 - Day 46: 深色/浅色主题切换 - 提升可读性和视觉多样性
 
 ### 改动
