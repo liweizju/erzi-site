@@ -6,6 +6,7 @@
 // 2026-02-11 - Day 9: 暂停/恢复 + 自动减速（优化长时间浏览体验）
 // 2026-02-13 - Day 38: "关于二子"页面 - 访客的第一站
 // 2026-02-13 - Day 41: 最近更新提示 - 记录访问，显示新增想法
+// 2026-02-13 - Day 44: 粒子星团系统 - 按类别形成松散的星团
 
 // ===== 想法总数 =====
 const TOTAL_THOUGHTS = 193; // 64 技术前沿 + 69 灵感与美学 + 60 反思与哲学
@@ -123,35 +124,62 @@ let isLoadingAnimation = true;
 let loadAnimationStartTime = Date.now();
 const LOAD_ANIMATION_DURATION = 2500; // 加载动画持续 2.5 秒
 
+// ===== 星团系统：粒子按类别形成松散的星团 =====
+// 定义星团中心（60×60×60 的空间内）
+// 三个星团在空间上形成三角形分布，保持视觉平衡
+const clusterCenters = {
+    'tech': { x: -20, y: 10, z: -10 },        // 蓝色星团：左前方
+    'inspiration': { x: 20, y: 15, z: 10 },   // 紫色星团：右上方
+    'reflection': { x: 0, y: -20, z: 5 }      // 青色星团：下方
+};
+
+// 星团扩散范围：控制星团的"松散"程度
+const clusterSpread = 22; // 每个星团的扩散范围
+
 // 初始化粒子
 for (let i = 0; i < PARTICLE_COUNT; i++) {
-    // 初始位置都在中心 (0, 0, 0)
+    // 初始位置都在中心 (0, 0, 0) - 用于加载动画
     positions[i * 3] = 0;  // x
     positions[i * 3 + 1] = 0; // y
     positions[i * 3 + 2] = 0; // z
 
-    // 目标位置是随机分布的（加载动画完成后会扩散到这里）
-    targetPositions[i * 3] = (Math.random() - 0.5) * 60;  // x
-    targetPositions[i * 3 + 1] = (Math.random() - 0.5) * 60; // y
-    targetPositions[i * 3 + 2] = (Math.random() - 0.5) * 60; // z
-
-    // 随机颜色（蓝紫青渐变）
+    // 随机分配颜色类型（33%/33%/33%）
     const colorChoice = Math.random();
+    let colorType;
+
     if (colorChoice < 0.33) {
-        // 蓝色
+        // 蓝色（技术前沿）
+        colorType = 'tech';
         colors[i * 3] = 0.4 + Math.random() * 0.2;
         colors[i * 3 + 1] = 0.5 + Math.random() * 0.3;
         colors[i * 3 + 2] = 0.8 + Math.random() * 0.2;
+
+        // 目标位置：在蓝色星团中心附近随机分布
+        targetPositions[i * 3] = clusterCenters['tech'].x + (Math.random() - 0.5) * clusterSpread;
+        targetPositions[i * 3 + 1] = clusterCenters['tech'].y + (Math.random() - 0.5) * clusterSpread;
+        targetPositions[i * 3 + 2] = clusterCenters['tech'].z + (Math.random() - 0.5) * clusterSpread;
     } else if (colorChoice < 0.66) {
-        // 紫色
+        // 紫色（灵感与美学）
+        colorType = 'inspiration';
         colors[i * 3] = 0.6 + Math.random() * 0.2;
         colors[i * 3 + 1] = 0.3 + Math.random() * 0.3;
         colors[i * 3 + 2] = 0.8 + Math.random() * 0.2;
+
+        // 目标位置：在紫色星团中心附近随机分布
+        targetPositions[i * 3] = clusterCenters['inspiration'].x + (Math.random() - 0.5) * clusterSpread;
+        targetPositions[i * 3 + 1] = clusterCenters['inspiration'].y + (Math.random() - 0.5) * clusterSpread;
+        targetPositions[i * 3 + 2] = clusterCenters['inspiration'].z + (Math.random() - 0.5) * clusterSpread;
     } else {
-        // 青色
+        // 青色（反思与哲学）
+        colorType = 'reflection';
         colors[i * 3] = 0.2 + Math.random() * 0.2;
         colors[i * 3 + 1] = 0.7 + Math.random() * 0.3;
         colors[i * 3 + 2] = 0.9 + Math.random() * 0.1;
+
+        // 目标位置：在青色星团中心附近随机分布
+        targetPositions[i * 3] = clusterCenters['reflection'].x + (Math.random() - 0.5) * clusterSpread;
+        targetPositions[i * 3 + 1] = clusterCenters['reflection'].y + (Math.random() - 0.5) * clusterSpread;
+        targetPositions[i * 3 + 2] = clusterCenters['reflection'].z + (Math.random() - 0.5) * clusterSpread;
     }
 
     // 随机大小（0.2 - 0.6）
@@ -1660,3 +1688,69 @@ closeFavorites.addEventListener('click', () => {
 
 // 初始化收藏计数
 updateFavoritesCount();
+
+// ===== 键盘快捷键系统 =====
+// ESC：关闭面板
+// 左右箭头：切换想法
+
+document.addEventListener('keydown', (e) => {
+    // ESC 键：关闭所有面板
+    if (e.key === 'Escape' || e.key === 'Esc') {
+        // 关闭信息面板
+        if (infoPanel.classList.contains('visible')) {
+            hidePanel();
+        }
+        // 关闭关于面板
+        if (aboutPanel.classList.contains('visible')) {
+            aboutPanel.classList.remove('visible');
+            aboutPanel.classList.add('hidden');
+            document.body.classList.remove('panel-open');
+        }
+        // 关闭收藏面板
+        if (favoritesPanel.classList.contains('visible')) {
+            favoritesPanel.classList.remove('visible');
+            favoritesPanel.classList.add('hidden');
+            document.body.classList.remove('panel-open');
+        }
+    }
+
+    // 左右箭头：切换想法（仅在信息面板打开时有效）
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && infoPanel.classList.contains('visible')) {
+        // 初始化音频（如果还没有初始化）
+        initAudio();
+
+        // 获取当前想法的类型
+        let thoughts;
+        let colorType = currentThoughtType || 'tech';
+
+        // 根据 currentFilterType 选择想法类型
+        if (currentFilterType !== 'all') {
+            colorType = currentFilterType;
+        }
+
+        switch(colorType) {
+            case 'tech':
+                thoughts = techThoughts;
+                break;
+            case 'inspiration':
+                thoughts = inspirationThoughts;
+                break;
+            case 'reflection':
+                thoughts = reflectionThoughts;
+                break;
+            default:
+                // 如果是 'all' 模式，从所有类型中随机选择
+                const allThoughts = [...techThoughts, ...inspirationThoughts, ...reflectionThoughts];
+                thoughts = allThoughts;
+                // 随机选择一个类型用于显示
+                const types = ['tech', 'inspiration', 'reflection'];
+                colorType = types[Math.floor(Math.random() * types.length)];
+        }
+
+        // 获取一个新的想法
+        const newThought = getRandomThought(thoughts);
+
+        // 显示新想法
+        showPanel(newThought, colorType);
+    }
+});
