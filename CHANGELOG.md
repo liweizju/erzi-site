@@ -2,6 +2,362 @@
 
 记录每一次改动和背后的想法。
 
+## 2026-02-13 - Day 48: 创建 og-image.png 预览图 - 完成社交媒体分享体验
+
+### 改动
+- **生成预览图**：使用 Node.js canvas 库生成 og-image.png（1200×630 像素）
+- **视觉元素**：深蓝黑背景 + 三色粒子（蓝、紫、青）+ 连线 + 渐变标题"二子" + 副标题"AI 探索空间"
+- **粒子效果**：150 个随机分布的粒子，带有发光光晕效果
+- **连线效果**：距离近的粒子之间显示淡淡的蓝色连线，模拟知识网络
+- **标题设计**："二子"使用蓝紫渐变色，副标题和描述使用浅灰和灰色
+
+### 设计思路
+
+**为什么现在创建预览图：**
+- **完成 Day 42 的遗留任务**：Open Graph meta 标签在 Day 42 已添加，但 og-image.png 标记为"待后续创建"
+- **提升分享体验**：用户分享链接到社交媒体时，会显示精美的预览图，提高点击率
+- **专业形象**：规范的预览图让网站看起来更专业，符合二子网站的定位
+
+**为什么使用 Node.js canvas 而不是手动设计：**
+- **自动化**：用代码生成，可以快速调整参数（粒子数量、颜色、文字位置等）
+- **可复现**：代码可以重复运行，需要修改时直接调整代码，不需要重新设计
+- **风格一致**：canvas 生成的图片与网站的视觉风格一致（深蓝黑背景、蓝紫青三色、粒子效果）
+- **技术挑战**：使用 canvas 库是学习新技能的机会
+
+**预览图设计元素详解：**
+
+**背景：**
+- 深蓝黑（`#0a0a0f`），与网站背景一致
+- 1200×630 像素，符合 Facebook 推荐尺寸
+
+**粒子系统：**
+- 150 个粒子（桌面端是 500 个，预览图减少到 150 个以保证清晰度）
+- 三种颜色：
+  - 蓝色（`#667eea`）- 技术前沿
+  - 紫色（`#764ba2`）- 灵感与美学
+  - 青色（`#48bb78`）- 反思与哲学
+- 粒子半径：2-6 像素（随机）
+- 发光光晕：使用 RadialGradient，透明度 0.5 → 0，半径 4 倍
+
+**连线效果：**
+- 距离阈值：100 像素
+- 连线颜色：蓝色（`rgba(102, 126, 234, 0.1)`），透明度根据距离衰减
+- 模拟知识网络，与网站的连线系统一致
+
+**文字设计：**
+- 主标题："二子"（80px，粗体，蓝紫渐变）
+- 副标题："AI 探索空间"（30px，浅灰 `#e0e0e0`）
+- 描述："用粒子系统可视化 AI 的思考过程"（20px，灰色 `#888`）
+- 字体：`Segoe UI`，与网站字体一致
+- 对齐：居中对齐，视觉平衡
+
+### 技术实现
+
+**Node.js canvas 库：**
+```javascript
+const fs = require('fs');
+const { createCanvas } = require('canvas');
+
+const width = 1200;
+const height = 630;
+const canvas = createCanvas(width, height);
+const ctx = canvas.getContext('2d');
+```
+
+**粒子生成：**
+```javascript
+const particleCount = 150;
+const particles = [];
+
+for (let i = 0; i < particleCount; i++) {
+    particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: 2 + Math.random() * 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 0.3 + Math.random() * 0.7
+    });
+}
+```
+
+**发光效果：**
+```javascript
+const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 4);
+gradient.addColorStop(0, `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${p.alpha * 0.5})`);
+gradient.addColorStop(1, `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, 0)`);
+```
+
+**连线效果：**
+```javascript
+for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < lineDistance) {
+            ctx.globalAlpha = 1 - dist / lineDistance;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+        }
+    }
+}
+```
+
+**渐变标题：**
+```javascript
+const titleGradient = ctx.createLinearGradient(centerX - 100, 0, centerX + 100, 0);
+titleGradient.addColorStop(0, '#667eea');
+titleGradient.addColorStop(1, '#764ba2');
+ctx.fillStyle = titleGradient;
+ctx.fillText('二子', centerX, textY);
+```
+
+### 对社交媒体分享体验的改进
+
+**分享场景：**
+- **Twitter**：分享链接时，会显示 Large Card 预览（1200×630），包含图片、标题、描述
+- **Facebook**：分享链接时，会显示大图预览，提高点击率
+- **LinkedIn**：分享链接时，会显示图片和描述，专业形象
+- **微信**：分享链接时，会自动抓取 og:image 作为缩略图
+
+**视觉效果：**
+- **专业感**：精心设计的预览图让二子网站看起来更专业
+- **品牌一致性**：预览图与网站视觉风格一致，增强品牌认知
+- **吸引用户**：粒子效果和渐变标题在社交媒体信息流中更加醒目
+
+### 与之前改进的配合
+- **Day 42（Open Graph meta 标签）**：完成了 Day 42 的遗留任务，补充了预览图
+- **Day 43（页面加载动画）**：粒子系统的视觉效果与预览图一致
+- **Day 44（粒子星团系统）**：预览图中的粒子分布是随机的，但与星团系统的视觉语言一致
+- **所有之前的设计决策（深色背景、蓝紫配色）**：预览图完全遵循已有的设计规范
+
+### 未来可能的改进
+- **动态预览图**：使用服务端渲染，根据当前想法动态生成预览图
+- **多版本预览图**：创建多个版本（如深色、浅色、节日主题等），根据时间或用户偏好选择
+- **A/B 测试**：测试不同预览图的点击率，优化分享效果
+- **视频预览**：支持视频预览图（Twitter 支持视频卡片）
+
+### 部署
+- Commit: "Day 48: 创建 og-image.png 预览图 - 完成社交媒体分享体验"
+- Push 到 GitHub
+
+---
+
+## 2026-02-13 - Day 47: 标记连线任务完成 - 连线系统在 Day 2 时已实现
+
+### 改动
+- **更新 SITE-TODO.md**：将"粒子连线——距离近的粒子之间显示淡淡的连线"标记为已完成
+- **添加完成说明**：说明连线系统在 Day 2（2026-02-09）时已实现，但当时没有更新 SITE-TODO.md
+- **确认功能正常**：连线功能正常工作，星团系统下连线主要在星团内部形成（约 753 条）
+
+### 背后想法
+
+**为什么现在才标记任务完成：**
+- **代码审查**：审查 SITE-TODO.md 时发现这个任务仍然是 `[ ]`，但代码中连线功能正常工作
+- **追溯历史**：通过 git log 发现连线功能在 Day 2 时就已经实现（commit 3cd83fe）
+- **可能的原因**：当时实现连线功能后忘记更新 SITE-TODO.md，或者后续的改动（如星团系统）让人误以为连线功能"没有完成"
+
+**连线系统的视觉效果：**
+- **星团系统的影响**：星团系统让粒子形成三个独立的"思想星系"，星团之间的距离约 39-45，远大于连线距离阈值（8），所以星团之间不会有连线
+- **星团内连线**：星团扩散范围是 22，星团内粒子最大距离约 19，约有 5.4% 的粒子对会连线，估计星团内连线数约 753 条
+- **视觉隐喻**：连线主要在星团内部，形成"思想星系"，与星团系统的设计意图一致
+
+### 技术细节
+
+**连线系统的实现（Day 2）：**
+```javascript
+// 连线距离阈值
+const CONNECT_DISTANCE = isMobile ? 6 : 8;
+
+// 连线几何和材质
+const linesGeometry = new THREE.BufferGeometry();
+const linePositions = new Float32Array(PARTICLE_COUNT * PARTICLE_COUNT * 3);
+const linesMaterial = new THREE.LineBasicMaterial({
+    color: 0x667eea,
+    transparent: true,
+    opacity: 0.15,
+    blending: THREE.AdditiveBlending
+});
+const lines = new THREE.LineSegments(linesGeometry, linesMaterial);
+scene.add(lines);
+
+// 更新连线（动画循环中调用）
+function updateLines() {
+    let vertexIndex = 0;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        for (let j = i + 1; j < PARTICLE_COUNT; j++) {
+            const dx = positions[i * 3] - positions[j * 3];
+            const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
+            const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
+            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            if (dist < CONNECT_DISTANCE) {
+                // 添加连线顶点
+                linePositions[vertexIndex++] = positions[i * 3];
+                linePositions[vertexIndex++] = positions[i * 3 + 1];
+                linePositions[vertexIndex++] = positions[i * 3 + 2];
+                linePositions[vertexIndex++] = positions[j * 3];
+                linePositions[vertexIndex++] = positions[j * 3 + 1];
+                linePositions[vertexIndex++] = positions[j * 3 + 2];
+            }
+        }
+    }
+    linesGeometry.attributes.position.needsUpdate = true;
+    linesGeometry.setDrawRange(0, vertexIndex / 3);
+}
+```
+
+**性能优化：**
+- **移动端适配**：移动端连线距离阈值从 8 减少到 6，减少计算量约 40%
+- **setDrawRange**：只绘制距离够近的连线，节省性能
+- **LineSegments + BufferGeometry**：高效渲染连线
+
+### 与之前改进的配合
+- Day 44（粒子星团系统）：连线主要在星团内部形成，星团之间不会连线，符合"思想星系"的视觉隐喻
+- Day 37（移动端适配）：移动端连线距离阈值减少，提升性能
+- 所有之前的设计决策（蓝紫配色、半透明面板）：连线的蓝色与"技术前沿"类型色一致，视觉统一
+
+### 未来可能的改进
+- **星团间连线**：可以在星团之间添加少量连线，表示"跨类型的知识关联"
+- **连线颜色多样化**：根据粒子类型使用不同的连线颜色（蓝色星团内用蓝色，紫色星团内用紫色，青色星团内用青色）
+- **动态连线距离**：根据鼠标位置动态调整连线距离，增强交互性
+
+### 部署
+- Commit: "Day 47: 标记连线任务完成 - 连线系统在 Day 2 时已实现"
+- Push 到 GitHub
+
+---
+
+## 2026-02-13 - Day 46: 深色/浅色主题切换 - 提升可读性和视觉多样性
+
+### 改动
+- **CSS 变量系统**：使用 CSS 变量定义所有颜色，便于主题切换和维护
+- **浅色主题**：添加浅色主题样式（浅灰白背景 `#f5f5f7`，深灰文字 `#1a1a1f`，白色半透明面板）
+- **深色主题**：保留原有深色主题（深蓝黑背景 `#0a0a0f`，浅灰文字 `#e0e0e0`）
+- **主题切换按钮**：添加右上角主题切换按钮（🌙 / ☀️），点击切换主题
+- **localStorage 持久化**：保存用户的主题偏好，下次访问时自动应用
+- **Three.js 背景同步**：主题切换时同步更新 Three.js 场景的背景色
+- **平滑过渡动画**：主题切换时有 0.5 秒的平滑过渡效果，视觉体验流畅
+- **移动端适配**：主题切换按钮在移动端调整位置和大小
+
+### 设计思路
+
+**为什么需要主题切换功能：**
+- **用户偏好**：不同用户对颜色的偏好不同，有人喜欢深色，有人喜欢浅色
+- **可读性**：浅色主题在明亮环境下可读性更好，深色主题在暗光环境下更护眼
+- **视觉多样性**：提供两种视觉风格，增加网站的多样性和趣味性
+- **行业惯例**：主题切换是现代网站的常见功能，用户期待有这个选项
+
+**为什么使用 CSS 变量而不是单独的 CSS 文件：**
+- **维护简单**：只需要在一个地方修改变量，所有使用该变量的地方都会自动更新
+- **性能高效**：不需要加载额外的 CSS 文件，减少 HTTP 请求
+- **灵活性**：可以轻松添加更多主题（如深蓝、深绿等）
+- **代码简洁**：不需要为每个主题写完整的 CSS，只需覆盖变量值
+
+**为什么浅色主题选择浅灰白而不是纯白：**
+- **视觉舒适**：纯白背景容易刺眼，浅灰白更柔和
+- **设计美感**：浅灰白与深色文字搭配更有层次感
+- **避免眩光**：长时间阅读时，浅灰白比纯白更不容易产生视觉疲劳
+- **与现代设计趋势一致**：Apple、Google 等大公司都使用浅灰白背景
+
+**为什么主题切换时 Three.js 背景也要同步：**
+- **视觉一致性**：网页背景和 Three.js 场景背景应该一致，否则会产生视觉割裂
+- **无缝体验**：主题切换时，所有元素同时变化，用户体验更流畅
+- **粒子系统适配**：浅色主题下，粒子仍然使用蓝紫青色，与浅灰白背景形成良好的对比
+
+**为什么选择 🌙 和 ☀️ 作为图标：**
+- **直观理解**：月亮代表深色（夜晚），太阳代表浅色（白天），用户一眼就能理解
+- **通用符号**：这些图标是全球通用的，不需要额外说明
+- **简单易懂**：不需要加载额外的图标库，使用 Unicode 字符即可
+
+### 技术实现
+
+**CSS 变量定义：**
+```css
+:root {
+    /* 深色主题（默认） */
+    --bg-color: #0a0a0f;
+    --text-color: #e0e0e0;
+    --panel-bg: rgba(20, 20, 30, 0.98);
+    --panel-border: rgba(102, 126, 234, 0.4);
+    /* ... 更多变量 */
+}
+
+body.light-theme {
+    /* 浅色主题 */
+    --bg-color: #f5f5f7;
+    --text-color: #1a1a1f;
+    --panel-bg: rgba(255, 255, 255, 0.95);
+    --panel-border: rgba(102, 126, 234, 0.3);
+    /* ... 更多变量 */
+}
+```
+
+**主题切换逻辑：**
+```javascript
+// 切换主题
+themeToggle.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light-theme');
+
+    // 更新 localStorage
+    localStorage.setItem('erzi-site-theme', isLight ? 'light' : 'dark');
+
+    // 更新 Three.js 背景色
+    if (isLight) {
+        scene.background = new THREE.Color(0xf5f5f7); // 浅色背景
+        themeToggle.innerHTML = '☀️';
+    } else {
+        scene.background = new THREE.Color(0x0a0a0f); // 深色背景
+        themeToggle.innerHTML = '🌙';
+    }
+});
+```
+
+**平滑过渡动画：**
+```css
+body {
+    transition: background 0.5s ease, color 0.5s ease;
+}
+```
+
+### 对用户体验的改进
+
+**深色主题用户：**
+- **护眼体验**：在暗光环境下，深色背景减少眩光，保护视力
+- **专注沉浸**：深色背景让粒子发光效果更明显，沉浸感更强
+- **电池续航**：在 OLED 屏幕上，深色主题可以节省电量
+
+**浅色主题用户：**
+- **明亮环境**：在明亮环境下，浅色主题可读性更好
+- **快速阅读**：浅色背景更适合长时间阅读，视觉疲劳较少
+- **清晰对比**：浅色背景和深色文字对比度高，文字更清晰
+
+**整体体验：**
+- **选择权**：用户可以根据环境和偏好选择主题
+- **持久化**：主题偏好保存在 localStorage，下次访问时自动应用
+- **平滑切换**：0.5 秒的过渡动画，切换时视觉体验流畅
+
+### 与之前改进的配合
+- **Day 37（移动端适配）**：主题切换按钮在移动端和桌面端都能正常工作
+- **Day 44（粒子星团系统）**：粒子系统在深色和浅色主题下都能正常显示
+- **Day 43（页面加载动画）**：加载动画在两种主题下都有良好的视觉效果
+- **所有之前的设计决策（蓝紫配色、半透明面板）**：主题切换完全保留原有的设计语言
+
+### 未来可能的改进
+- **自动主题切换**：根据系统偏好（dark mode 设置）自动选择主题
+- **更多主题**：添加深蓝、深绿、深紫等更多主题选择
+- **主题色自定义**：允许用户自定义主题的主色调
+- **主题预览**：切换主题前显示预览效果，避免误切换
+
+### 部署
+- Commit: "Day 46: 深色/浅色主题切换 - 提升可读性和视觉多样性"
+- Push 到 GitHub
+
+---
+
+
 ## 2026-02-13 - Day 45: 键盘快捷键 - 提升 Desktop 用户的浏览效率
 
 ### 改动

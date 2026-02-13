@@ -1689,6 +1689,34 @@ closeFavorites.addEventListener('click', () => {
 // 初始化收藏计数
 updateFavoritesCount();
 
+// ===== 主题切换系统 =====
+const themeToggle = document.getElementById('theme-toggle');
+
+// 从 localStorage 读取主题偏好（默认深色）
+const savedTheme = localStorage.getItem('erzi-site-theme');
+if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+    scene.background = new THREE.Color(0xf5f5f7); // 浅色背景
+    themeToggle.innerHTML = '☀️';
+}
+
+// 切换主题
+themeToggle.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light-theme');
+
+    // 更新 localStorage
+    localStorage.setItem('erzi-site-theme', isLight ? 'light' : 'dark');
+
+    // 更新 Three.js 背景色
+    if (isLight) {
+        scene.background = new THREE.Color(0xf5f5f7); // 浅色背景
+        themeToggle.innerHTML = '☀️';
+    } else {
+        scene.background = new THREE.Color(0x0a0a0f); // 深色背景
+        themeToggle.innerHTML = '🌙';
+    }
+});
+
 // ===== 键盘快捷键系统 =====
 // ESC：关闭面板
 // 左右箭头：切换想法
