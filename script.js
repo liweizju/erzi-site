@@ -1166,11 +1166,30 @@ const aboutPanel = document.getElementById('about-panel');
 const aboutTrigger = document.getElementById('about-trigger');
 const closeAbout = document.getElementById('close-about');
 
+// 更新"关于二子"面板的统计信息
+function updateAboutStats() {
+    // 计算想法总数
+    const total = techThoughts.length + inspirationThoughts.length + reflectionThoughts.length;
+    
+    // 计算运行天数（从 2026-02-07 开始）
+    const startDate = new Date('2026-02-07');
+    const today = new Date();
+    const runDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+    
+    // 更新 DOM
+    document.getElementById('total-thoughts').textContent = total;
+    document.querySelector('.tech-count').textContent = `技术 ${techThoughts.length}`;
+    document.querySelector('.inspiration-count').textContent = `灵感 ${inspirationThoughts.length}`;
+    document.querySelector('.reflection-count').textContent = `反思 ${reflectionThoughts.length}`;
+    document.getElementById('run-days').textContent = runDays;
+}
+
 // 点击"二子"标题显示关于面板
 aboutTrigger.addEventListener('click', () => {
     aboutPanel.classList.remove('hidden');
     aboutPanel.classList.add('visible');
     document.body.classList.add('panel-open');
+    updateAboutStats(); // 更新统计信息
 });
 
 // 关闭关于面板
