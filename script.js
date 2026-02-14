@@ -1733,6 +1733,124 @@ themeToggle.addEventListener('click', () => {
     }
 });
 
+// ===== 随机漫游系统 =====
+const randomBtn = document.getElementById('random-btn');
+let isAnimating = false; // 防止重复触发
+
+// 随机漫游：随机选择一个想法，镜头飞向对应粒子
+randomBtn.addEventListener('click', () => {
+    if (isAnimating || isLoadingAnimation) return;
+
+    isAnimating = true;
+
+    // 初始化音频（如果还没有初始化）
+    initAudio();
+
+    // 随机选择想法类型
+    const types = ['tech', 'inspiration', 'reflection'];
+    const randomType = types[Math.floor(Math.random() * types.length)];
+
+    let thoughts;
+    switch(randomType) {
+        case 'tech':
+            thoughts = techThoughts;
+            break;
+        case 'inspiration':
+            thoughts = inspirationThoughts;
+            break;
+        case 'reflection':
+            thoughts = reflectionThoughts;
+            break;
+    }
+
+    // 随机选择一个想法
+    const randomThought = getRandomThought(thoughts);
+
+    // 找到对应类型的粒子
+    let targetParticleIndex = -1;
+
+    // 根据类型找到对应颜色的粒子
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const r = colors[i * 3];
+        const g = colors[i * 3 + 1];
+        const b = colors[i * 3 + 2];
+
+        let particleType;
+        if (b > r && b > g && r > g) {
+            particleType = 'inspiration';
+        } else if (g > r || g > b) {
+            particleType = 'reflection';
+        } else {
+            particleType = 'tech';
+        }
+
+        if (particleType === randomType) {
+            targetParticleIndex = i;
+            break;
+        }
+    }
+
+    // 如果没找到对应类型的粒子，随机选一个
+    if (targetParticleIndex === -1) {
+        targetParticleIndex = Math.floor(Math.random() * PARTICLE_COUNT);
+    }
+
+    // 获取目标粒子位置
+    const targetX = positions[targetParticleIndex * 3];
+    const targetY = positions[targetParticleIndex * 3 + 1];
+    const targetZ = positions[targetParticleIndex * 3 + 2];
+
+    // 镜头飞向粒子（平滑动画）
+    const startX = camera.position.x;
+    const startY = camera.position.y;
+    const startZ = camera.position.z;
+
+    // 目标位置：粒子前方一点距离
+    const targetCameraX = targetX * 0.5;
+    const targetCameraY = targetY * 0.5;
+    const targetCameraZ = 40 + targetZ * 0.3; // 保持一定的 z 距离
+
+    const duration = 800; // 动画时长（毫秒）
+    const startTime = Date.now();
+
+    function animateCamera() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // 使用 easeOutCubic 缓动函数
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+        // 插值计算相机位置
+        camera.position.x = startX + (targetCameraX - startX) * easedProgress;
+        camera.position.y = startY + (targetCameraY - startY) * easedProgress;
+        camera.position.z = startZ + (targetCameraZ - startZ) * easedProgress;
+
+        if (progress < 1) {
+            requestAnimationFrame(animateCamera);
+        } else {
+            // 动画完成，显示想法面板
+            showPanel(randomThought, randomType);
+            playThoughtSound(randomType);
+
+            // 创建涟漪效果
+            createRipple(targetX, targetY, targetZ);
+
+            // 视觉反馈：放大粒子
+            const originalSize = originalSizes[targetParticleIndex];
+            targetSizes[targetParticleIndex] = originalSize * 4;
+
+            // 2秒后恢复
+            setTimeout(() => {
+                targetSizes[targetParticleIndex] = originalSize;
+            }, 2000);
+
+            isAnimating = false;
+        }
+    }
+
+    animateCamera();
+});
+
 // ===== 键盘快捷键系统 =====
 // ESC：关闭面板
 // 左右箭头：切换想法

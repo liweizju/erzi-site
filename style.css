@@ -1249,7 +1249,7 @@ h1.clickable:active {
 .theme-toggle {
     position: fixed;
     top: 2rem;
-    right: 9.5rem;
+    right: 12.5rem;
     background: rgba(102, 126, 234, 0.15);
     border: 1px solid rgba(102, 126, 234, 0.3);
     color: #667eea;
@@ -1287,11 +1287,62 @@ body.light-theme .theme-toggle:hover {
     background: rgba(102, 126, 234, 0.2);
 }
 
-/* 移动端：主题切换按钮调整 */
+/* 随机漫游按钮 */
+.random-btn {
+    position: fixed;
+    top: 2rem;
+    right: 9.5rem;
+    background: rgba(72, 187, 120, 0.15);
+    border: 1px solid rgba(72, 187, 120, 0.3);
+    color: #48bb78;
+    padding: 0.6rem;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.random-btn:hover {
+    background: rgba(72, 187, 120, 0.25);
+    border-color: rgba(72, 187, 120, 0.5);
+    transform: scale(1.1);
+}
+
+.random-btn:active {
+    transform: scale(0.95);
+}
+
+/* 浅色主题下的随机按钮样式 */
+body.light-theme .random-btn {
+    background: rgba(72, 187, 120, 0.1);
+    border: 1px solid rgba(72, 187, 120, 0.3);
+}
+
+body.light-theme .random-btn:hover {
+    background: rgba(72, 187, 120, 0.2);
+}
+
+/* 移动端：主题切换和随机按钮调整 */
 @media (max-width: 768px) {
     .theme-toggle {
         top: 1rem;
         right: 7rem;
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+        padding: 0.5rem;
+    }
+
+    .random-btn {
+        top: 1rem;
+        right: 4.5rem;
         width: 36px;
         height: 36px;
         font-size: 1rem;
