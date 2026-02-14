@@ -33,33 +33,35 @@
     --no-results: #888;
     --type-text-light: rgba(255, 255, 255, 0.85);
     --related-section-title: rgba(255, 255, 255, 0.7);
+    --panel-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(102, 126, 234, 0.1);
 }
 
 body.light-theme {
     /* 浅色主题 */
     --bg-color: #f5f5f7;
     --text-color: #1a1a1f;
-    --text-secondary: #666;
-    --panel-bg: rgba(255, 255, 255, 0.95);
-    --panel-border: rgba(102, 126, 234, 0.3);
+    --text-secondary: #555;
+    --panel-bg: rgba(255, 255, 255, 0.96);
+    --panel-border: rgba(102, 126, 234, 0.25);
     --text-light: #1a1a1f;
     --text-light-transparent: rgba(26, 26, 31, 0.85);
-    --hint-color: #667eea;
-    --footer-text: #888;
-    --search-input-bg: rgba(0, 0, 0, 0.05);
+    --hint-color: #4a5bd4;
+    --footer-text: #666;
+    --search-input-bg: rgba(0, 0, 0, 0.04);
     --search-input-color: #1a1a1f;
-    --search-input-placeholder: #999;
+    --search-input-placeholder: #888;
     --item-bg: rgba(0, 0, 0, 0.03);
-    --item-border: rgba(0, 0, 0, 0.08);
-    --detail-bg: rgba(0, 0, 0, 0.03);
-    --search-result-item-bg: rgba(0, 0, 0, 0.03);
-    --search-result-item-border: rgba(0, 0, 0, 0.08);
-    --separator: rgba(0, 0, 0, 0.1);
-    --overlay-bg: rgba(0, 0, 0, 0.02);
-    --scrollbar-track: rgba(0, 0, 0, 0.05);
+    --item-border: rgba(0, 0, 0, 0.06);
+    --detail-bg: rgba(102, 126, 234, 0.05);
+    --search-result-item-bg: rgba(0, 0, 0, 0.02);
+    --search-result-item-border: rgba(0, 0, 0, 0.06);
+    --separator: rgba(0, 0, 0, 0.08);
+    --overlay-bg: rgba(0, 0, 0, 0.015);
+    --scrollbar-track: rgba(0, 0, 0, 0.04);
     --no-results: #666;
-    --type-text-light: rgba(0, 0, 0, 0.85);
-    --related-section-title: rgba(0, 0, 0, 0.7);
+    --type-text-light: rgba(26, 26, 31, 0.85);
+    --related-section-title: rgba(26, 26, 31, 0.6);
+    --panel-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 body {
@@ -202,7 +204,7 @@ h1 {
     max-width: 90%;
     width: 450px;
     backdrop-filter: blur(15px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(102, 126, 234, 0.1);
+    box-shadow: var(--panel-shadow);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: auto;
 }
@@ -791,7 +793,7 @@ h1 {
     max-height: 80vh;
     overflow-y: auto;
     backdrop-filter: blur(15px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(118, 75, 162, 0.1);
+    box-shadow: var(--panel-shadow);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: auto;
 }
@@ -1220,7 +1222,7 @@ h1.clickable:active {
     max-width: 90%;
     width: 480px;
     backdrop-filter: blur(15px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(102, 126, 234, 0.1);
+    box-shadow: var(--panel-shadow);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: auto;
 }
@@ -1492,5 +1494,299 @@ body.light-theme .random-btn:hover {
         font-size: 1rem;
         padding: 0.5rem;
     }
+}
+
+/* ===== 浅色主题特殊样式优化 ===== */
+
+/* 类型标签在浅色模式下加深颜色 */
+body.light-theme #info-panel .type-tag.tech {
+    background: rgba(74, 91, 212, 0.15);
+    color: #4a5bd4;
+    border: 1px solid rgba(74, 91, 212, 0.35);
+}
+
+body.light-theme #info-panel .type-tag.inspiration {
+    background: rgba(138, 43, 158, 0.15);
+    color: #8a2b9e;
+    border: 1px solid rgba(138, 43, 158, 0.35);
+}
+
+body.light-theme #info-panel .type-tag.reflection {
+    background: rgba(34, 139, 87, 0.15);
+    color: #228b57;
+    border: 1px solid rgba(34, 139, 87, 0.35);
+}
+
+/* 搜索结果中的类型标签 */
+body.light-theme .search-result-item .type-tag.tech {
+    background: rgba(74, 91, 212, 0.15);
+    color: #4a5bd4;
+    border: 1px solid rgba(74, 91, 212, 0.35);
+}
+
+body.light-theme .search-result-item .type-tag.inspiration {
+    background: rgba(138, 43, 158, 0.15);
+    color: #8a2b9e;
+    border: 1px solid rgba(138, 43, 158, 0.35);
+}
+
+body.light-theme .search-result-item .type-tag.reflection {
+    background: rgba(34, 139, 87, 0.15);
+    color: #228b57;
+    border: 1px solid rgba(34, 139, 87, 0.35);
+}
+
+/* 收藏面板中的类型标签 */
+body.light-theme #favorites-panel .type-tag.tech {
+    background: rgba(74, 91, 212, 0.15);
+    color: #4a5bd4;
+    border: 1px solid rgba(74, 91, 212, 0.35);
+}
+
+body.light-theme #favorites-panel .type-tag.inspiration {
+    background: rgba(138, 43, 158, 0.15);
+    color: #8a2b9e;
+    border: 1px solid rgba(138, 43, 158, 0.35);
+}
+
+body.light-theme #favorites-panel .type-tag.reflection {
+    background: rgba(34, 139, 87, 0.15);
+    color: #228b57;
+    border: 1px solid rgba(34, 139, 87, 0.35);
+}
+
+/* 相关想法在浅色模式下加深颜色 */
+body.light-theme .related-item.tech {
+    color: rgba(74, 91, 212, 0.9);
+}
+
+body.light-theme .related-item.tech:hover {
+    border-color: rgba(74, 91, 212, 0.35);
+    box-shadow: 0 2px 8px rgba(74, 91, 212, 0.15);
+}
+
+body.light-theme .related-item.tech::before {
+    background: #4a5bd4;
+}
+
+body.light-theme .related-item.inspiration {
+    color: rgba(138, 43, 158, 0.9);
+}
+
+body.light-theme .related-item.inspiration:hover {
+    border-color: rgba(138, 43, 158, 0.35);
+    box-shadow: 0 2px 8px rgba(138, 43, 158, 0.15);
+}
+
+body.light-theme .related-item.inspiration::before {
+    background: #8a2b9e;
+}
+
+body.light-theme .related-item.reflection {
+    color: rgba(34, 139, 87, 0.9);
+}
+
+body.light-theme .related-item.reflection:hover {
+    border-color: rgba(34, 139, 87, 0.35);
+    box-shadow: 0 2px 8px rgba(34, 139, 87, 0.15);
+}
+
+body.light-theme .related-item.reflection::before {
+    background: #228b57;
+}
+
+/* 筛选按钮在浅色模式下加深颜色 */
+body.light-theme .filter-btn {
+    background: rgba(74, 91, 212, 0.08);
+    border: 1px solid rgba(74, 91, 212, 0.2);
+    color: #4a5bd4;
+}
+
+body.light-theme .filter-btn:hover {
+    background: rgba(74, 91, 212, 0.15);
+    border-color: rgba(74, 91, 212, 0.35);
+}
+
+body.light-theme .filter-btn.active {
+    background: rgba(74, 91, 212, 0.2);
+    border-color: rgba(74, 91, 212, 0.4);
+    color: #4a5bd4;
+}
+
+body.light-theme .filter-btn[data-type="tech"]:hover,
+body.light-theme .filter-btn[data-type="tech"].active {
+    background: rgba(74, 91, 212, 0.2);
+    border-color: rgba(74, 91, 212, 0.4);
+    color: #4a5bd4;
+}
+
+body.light-theme .filter-btn[data-type="inspiration"]:hover,
+body.light-theme .filter-btn[data-type="inspiration"].active {
+    background: rgba(138, 43, 158, 0.2);
+    border-color: rgba(138, 43, 158, 0.4);
+    color: #8a2b9e;
+}
+
+body.light-theme .filter-btn[data-type="reflection"]:hover,
+body.light-theme .filter-btn[data-type="reflection"].active {
+    background: rgba(34, 139, 87, 0.2);
+    border-color: rgba(34, 139, 87, 0.4);
+    color: #228b57;
+}
+
+/* 搜索框在浅色模式下优化 */
+body.light-theme #search-input:focus {
+    border-color: rgba(74, 91, 212, 0.5);
+    box-shadow: 0 0 0 2px rgba(74, 91, 212, 0.15);
+}
+
+body.light-theme .search-thought-text mark {
+    background: rgba(74, 91, 212, 0.25);
+    color: #4a5bd4;
+}
+
+/* 收藏面板边框在浅色模式下调整 */
+body.light-theme #favorites-panel {
+    border: 1px solid rgba(138, 43, 158, 0.25);
+}
+
+/* Toast 在浅色模式下优化 */
+body.light-theme #guide-toast {
+    background: rgba(74, 91, 212, 0.95);
+    box-shadow: 0 4px 20px rgba(74, 91, 212, 0.25);
+}
+
+body.light-theme #update-toast {
+    background: rgba(138, 43, 158, 0.95);
+    box-shadow: 0 4px 20px rgba(138, 43, 158, 0.25);
+}
+
+body.light-theme #copy-toast {
+    background: rgba(74, 91, 212, 0.95);
+    box-shadow: 0 4px 20px rgba(74, 91, 212, 0.25);
+}
+
+/* 知识库链接在浅色模式下优化 */
+body.light-theme .knowledge-link {
+    background: rgba(74, 91, 212, 0.1);
+    border: 1px solid rgba(74, 91, 212, 0.3);
+    color: #4a5bd4;
+}
+
+body.light-theme .knowledge-link:hover {
+    background: rgba(74, 91, 212, 0.18);
+    border-color: rgba(74, 91, 212, 0.45);
+    box-shadow: 0 4px 12px rgba(74, 91, 212, 0.15);
+}
+
+/* 收藏按钮在浅色模式下优化 */
+body.light-theme .favorite-btn {
+    background: rgba(236, 72, 153, 0.08);
+    border: 1px solid rgba(236, 72, 153, 0.25);
+    color: #d63384;
+}
+
+body.light-theme .favorite-btn:hover {
+    background: rgba(236, 72, 153, 0.15);
+    border-color: rgba(236, 72, 153, 0.4);
+}
+
+body.light-theme .favorite-btn.favorited {
+    background: rgba(236, 72, 153, 0.18);
+    border-color: rgba(236, 72, 153, 0.4);
+    color: #d63384;
+}
+
+/* 分享按钮在浅色模式下优化 */
+body.light-theme .share-btn {
+    background: rgba(74, 91, 212, 0.08);
+    border: 1px solid rgba(74, 91, 212, 0.25);
+    color: #4a5bd4;
+}
+
+body.light-theme .share-btn:hover {
+    background: rgba(74, 91, 212, 0.15);
+    border-color: rgba(74, 91, 212, 0.4);
+}
+
+/* 触发更多按钮在浅色模式下优化 */
+body.light-theme #info-panel .trigger-more {
+    background: rgba(74, 91, 212, 0.08);
+    border: 1px solid rgba(74, 91, 212, 0.25);
+    color: #4a5bd4;
+}
+
+body.light-theme #info-panel .trigger-more:hover {
+    background: rgba(74, 91, 212, 0.15);
+    border-color: rgba(74, 91, 212, 0.4);
+}
+
+/* 展开/收起按钮在浅色模式下优化 */
+body.light-theme .toggle-detail-btn {
+    background: rgba(74, 91, 212, 0.06);
+    border: 1px solid rgba(74, 91, 212, 0.2);
+}
+
+body.light-theme .toggle-detail-btn:hover {
+    background: rgba(74, 91, 212, 0.12);
+    border-color: rgba(74, 91, 212, 0.35);
+}
+
+/* 详情部分在浅色模式下优化 */
+body.light-theme .detail-section {
+    background: rgba(74, 91, 212, 0.05);
+    border-left: 3px solid rgba(74, 91, 212, 0.35);
+}
+
+/* 收藏项目在浅色模式下优化 */
+body.light-theme .favorite-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(138, 43, 158, 0.2);
+}
+
+/* 移除收藏按钮在浅色模式下优化 */
+body.light-theme .remove-favorite {
+    background: rgba(236, 72, 153, 0.1);
+    border: 1px solid rgba(236, 72, 153, 0.25);
+    color: #d63384;
+}
+
+body.light-theme .remove-favorite:hover {
+    background: rgba(236, 72, 153, 0.18);
+    border-color: rgba(236, 72, 153, 0.4);
+}
+
+/* 关于面板链接在浅色模式下优化 */
+body.light-theme .about-link {
+    background: rgba(74, 91, 212, 0.1);
+    border: 1px solid rgba(74, 91, 212, 0.3);
+    color: #4a5bd4;
+}
+
+body.light-theme .about-link:hover {
+    background: rgba(74, 91, 212, 0.18);
+    border-color: rgba(74, 91, 212, 0.45);
+}
+
+/* 滚动条在浅色模式下优化 */
+body.light-theme .search-results::-webkit-scrollbar-thumb {
+    background: rgba(74, 91, 212, 0.25);
+}
+
+body.light-theme .search-results::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 91, 212, 0.4);
+}
+
+body.light-theme #favorites-panel::-webkit-scrollbar-thumb {
+    background: rgba(138, 43, 158, 0.25);
+}
+
+body.light-theme #favorites-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(138, 43, 158, 0.4);
+}
+
+/* Canvas 模糊效果在浅色模式下减弱 */
+body.light-theme.panel-open #canvas {
+    filter: blur(2px);
 }
 

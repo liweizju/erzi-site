@@ -118,11 +118,26 @@ const originalSizes = new Float32Array(PARTICLE_COUNT); // 原始大小
 const targetSizes = new Float32Array(PARTICLE_COUNT); // 目标大小
 const velocities = [];
 const targetPositions = new Float32Array(PARTICLE_COUNT * 3); // 加载动画目标位置
+const particleColorTypes = []; // 保存每个粒子的颜色类型
 
 // 加载动画控制
 let isLoadingAnimation = true;
 let loadAnimationStartTime = Date.now();
 const LOAD_ANIMATION_DURATION = 2500; // 加载动画持续 2.5 秒
+
+// ===== 浅色主题粒子颜色 =====
+// 深色模式颜色在浅色背景上太淡，浅色模式需要调暗以增加对比度
+const lightThemeColors = {
+    'tech': { r: [0.25, 0.35], g: [0.3, 0.5], b: [0.5, 0.65] },        // 蓝色调暗
+    'inspiration': { r: [0.4, 0.55], g: [0.2, 0.4], b: [0.55, 0.7] }, // 紫色调暗
+    'reflection': { r: [0.15, 0.25], g: [0.45, 0.65], b: [0.55, 0.7] } // 青色调暗
+};
+
+const darkThemeColors = {
+    'tech': { r: [0.4, 0.6], g: [0.5, 0.8], b: [0.8, 1.0] },           // 蓝色原色
+    'inspiration': { r: [0.6, 0.8], g: [0.3, 0.6], b: [0.8, 1.0] },    // 紫色原色
+    'reflection': { r: [0.2, 0.4], g: [0.7, 1.0], b: [0.9, 1.0] }      // 青色原色
+};
 
 // ===== 星团系统：粒子按类别形成松散的星团 =====
 // 定义星团中心（60×60×60 的空间内）
@@ -150,6 +165,7 @@ for (let i = 0; i < PARTICLE_COUNT; i++) {
     if (colorChoice < 0.33) {
         // 蓝色（技术前沿）
         colorType = 'tech';
+        particleColorTypes[i] = 'tech';
         colors[i * 3] = 0.4 + Math.random() * 0.2;
         colors[i * 3 + 1] = 0.5 + Math.random() * 0.3;
         colors[i * 3 + 2] = 0.8 + Math.random() * 0.2;
@@ -161,6 +177,7 @@ for (let i = 0; i < PARTICLE_COUNT; i++) {
     } else if (colorChoice < 0.66) {
         // 紫色（灵感与美学）
         colorType = 'inspiration';
+        particleColorTypes[i] = 'inspiration';
         colors[i * 3] = 0.6 + Math.random() * 0.2;
         colors[i * 3 + 1] = 0.3 + Math.random() * 0.3;
         colors[i * 3 + 2] = 0.8 + Math.random() * 0.2;
@@ -172,6 +189,7 @@ for (let i = 0; i < PARTICLE_COUNT; i++) {
     } else {
         // 青色（反思与哲学）
         colorType = 'reflection';
+        particleColorTypes[i] = 'reflection';
         colors[i * 3] = 0.2 + Math.random() * 0.2;
         colors[i * 3 + 1] = 0.7 + Math.random() * 0.3;
         colors[i * 3 + 2] = 0.9 + Math.random() * 0.1;
@@ -1811,12 +1829,32 @@ updateFavoritesCount();
 // ===== 主题切换系统 =====
 const themeToggle = document.getElementById('theme-toggle');
 
+// 更新粒子颜色以匹配当前主题
+function updateParticleColors(isLight) {
+    const colorScheme = isLight ? lightThemeColors : darkThemeColors;
+    
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const type = particleColorTypes[i];
+        const scheme = colorScheme[type];
+        
+        // 使用保存的颜色类型重新计算颜色（保持一定的随机性）
+        colors[i * 3] = scheme.r[0] + Math.random() * (scheme.r[1] - scheme.r[0]);
+        colors[i * 3 + 1] = scheme.g[0] + Math.random() * (scheme.g[1] - scheme.g[0]);
+        colors[i * 3 + 2] = scheme.b[0] + Math.random() * (scheme.b[1] - scheme.b[0]);
+    }
+    
+    // 更新 BufferAttribute
+    particles.attributes.color.needsUpdate = true;
+}
+
 // 从 localStorage 读取主题偏好（默认深色）
 const savedTheme = localStorage.getItem('erzi-site-theme');
 if (savedTheme === 'light') {
     document.body.classList.add('light-theme');
     scene.background = new THREE.Color(0xf5f5f7); // 浅色背景
     themeToggle.innerHTML = '☀️';
+    // 更新粒子颜色为浅色模式
+    updateParticleColors(true);
 }
 
 // 切换主题
@@ -1826,13 +1864,15 @@ themeToggle.addEventListener('click', () => {
     // 更新 localStorage
     localStorage.setItem('erzi-site-theme', isLight ? 'light' : 'dark');
 
-    // 更新 Three.js 背景色
+    // 更新 Three.js 背景色和粒子颜色
     if (isLight) {
         scene.background = new THREE.Color(0xf5f5f7); // 浅色背景
         themeToggle.innerHTML = '☀️';
+        updateParticleColors(true);
     } else {
         scene.background = new THREE.Color(0x0a0a0f); // 深色背景
         themeToggle.innerHTML = '🌙';
+        updateParticleColors(false);
     }
 });
 
