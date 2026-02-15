@@ -433,12 +433,12 @@ function animate() {
         if (Math.abs(positions[i * 3 + 1]) > boundary) velocities[i].y *= -1;
         if (Math.abs(positions[i * 3 + 2]) > boundary) velocities[i].z *= -1;
         
-        // 扰动响应
+        // 扰动响应（只计算 x-y 平面距离）
         if (perturbPosition) {
             const dx = positions[i * 3] - perturbPosition.x;
             const dy = positions[i * 3 + 1] - perturbPosition.y;
-            const dz = positions[i * 3 + 2] - perturbPosition.z;
-            const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            // 忽略 z 轴，只计算平面距离
+            const distance = Math.sqrt(dx * dx + dy * dy);
             
             if (distance < CONFIG.PERTURB_RADIUS && distance > 0) {
                 const reaction = Math.random();
@@ -448,12 +448,10 @@ function animate() {
                     // 靠近
                     velocities[i].x -= (dx / distance) * strength;
                     velocities[i].y -= (dy / distance) * strength;
-                    velocities[i].z -= (dz / distance) * strength;
                 } else if (reaction < CONFIG.PERTURB_ATTRACT_PROB + CONFIG.PERTURB_REPEL_PROB) {
                     // 远离
                     velocities[i].x += (dx / distance) * strength;
                     velocities[i].y += (dy / distance) * strength;
-                    velocities[i].z += (dz / distance) * strength;
                 }
                 // 40% 无视
             }
@@ -491,6 +489,9 @@ function animate() {
 function onTouch(event) {
     if (isPeekWindowOpen) return;
     
+    // 阻止事件冒泡，避免触发 onWindowClick
+    event.stopPropagation();
+    
     // 计算3D坐标
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -523,7 +524,7 @@ function onTouch(event) {
 
 // A2: 扰动感知
 function onPerturb(event) {
-    // 计算3D坐标
+    // 计算3D坐标（只计算 x-y 平面，z 使用粒子实际位置）
     const vector = new THREE.Vector3(
         (event.clientX / window.innerWidth) * 2 - 1,
         -(event.clientY / window.innerHeight) * 2 + 1,
@@ -535,7 +536,8 @@ function onPerturb(event) {
     const distance = -camera.position.z / dir.z;
     const pos = camera.position.clone().add(dir.multiplyScalar(distance));
     
-    perturbPosition = pos;
+    // 只存储 x-y 坐标，扰动计算时只考虑平面距离
+    perturbPosition = { x: pos.x, y: pos.y, z: 0 };
 }
 
 // A3: 主动展示
