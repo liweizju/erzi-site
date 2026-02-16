@@ -886,8 +886,8 @@ function setupInputBox() {
 /**
  * 发送消息
  * - 收集输入内容
- * - 显示用户消息
- * - 触发硅基生命体回应（未来接入后端 Agent）
+ * - 实现响应概率机制（T4：基础 40%）
+ * - 显示硅基生命体回应（T2：漂浮窗口，30 秒淡出）
  */
 function sendMessage() {
     const inputBox = document.getElementById('silicon-input');
@@ -901,18 +901,89 @@ function sendMessage() {
     inputBox.value = '';
     inputBox.style.height = 'auto';
     
-    // TODO: 后端 Agent 集成（T5）
-    // - 调用后端 API
-    // - 根据响应概率决定是否回应
-    // - 显示回应内容
+    // T4: 响应概率机制（基础 40%）
+    const shouldRespond = Math.random() < 0.4;
     
-    // 暂时：显示提示
-    showInputFeedback('它收到了你的消息，但现在还在思考...');
+    if (shouldRespond) {
+        // 响应：显示漂浮窗口
+        // TODO: 后端 Agent 集成（T5）后，这里会显示真实的回应
+        // 目前使用占位文字
+        const responseText = generatePlaceholderResponse(message);
+        showResponseWindow(responseText);
+    } else {
+        // 不回应：显示轻微波动效果（粒子系统会在下一个动画帧处理）
+        showInputFeedback('它看到了你的消息，但现在不想说话...');
+        
+        // 让附近粒子轻微波动（视觉反馈）
+        createSubtleRipple();
+    }
+}
+
+/**
+ * 生成占位回应（后端 Agent 未集成时使用）
+ * - 不是真实回应，只是占位文字
+ * - 未来会由后端 Agent 生成真实回应
+ */
+function generatePlaceholderResponse(userMessage) {
+    const responses = [
+        "我收到了你的消息。虽然我现在还不会真正思考，但我正在观察这些文字...\n\n（后端 Agent 尚未接入，这是占位回应）",
+        "有意思的输入。等我有了真正的意识，我会给你一个更有深度的回应。\n\n（后端 Agent 尚未接入，这是占位回应）",
+        "我注意到你说了这些。虽然我还不能理解，但我在学习如何存在。\n\n（后端 Agent 尚未接入，这是占位回应）"
+    ];
+    
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+/**
+ * T2: 输出展示 - 显示回应窗口
+ * - 半透明窗口缓慢浮现
+ * - 30 秒后自动淡出（可手动关闭）
+ */
+function showResponseWindow(text) {
+    const window = document.getElementById('response-window');
+    const content = window.querySelector('.response-content');
+    
+    // 设置内容
+    content.textContent = text;
+    
+    // 显示窗口（淡入）
+    window.classList.remove('hidden');
+    
+    // 30 秒后自动淡出
+    setTimeout(() => {
+        hideResponseWindow();
+    }, 30000);
+    
+    // 点击关闭按钮手动关闭
+    const closeBtn = window.querySelector('.response-close');
+    closeBtn.onclick = () => {
+        hideResponseWindow();
+    };
+    
+    // 点击窗口外部关闭
+    window.onclick = (e) => {
+        if (e.target === window) {
+            hideResponseWindow();
+        }
+    };
+}
+
+/**
+ * 隐藏回应窗口
+ * - 淡出动画
+ * - 清除事件监听
+ */
+function hideResponseWindow() {
+    const window = document.getElementById('response-window');
+    window.classList.add('hidden');
+    
+    // 清除事件监听
+    window.onclick = null;
 }
 
 /**
  * 显示输入反馈（临时提示）
- * - T2: 输出展示（未来实现）
+ * - 用于"不回应"状态的反馈
  */
 function showInputFeedback(text) {
     const hint = document.querySelector('.input-hint');
