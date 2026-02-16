@@ -218,17 +218,31 @@ function createParticles() {
         // 映射想法（如果有想法数据）
         if (thoughts[freq] && thoughts[freq].length > 0) {
             const idx = thoughtIndex[freq] % thoughts[freq].length;
-            particleThoughtMap.push({
-                frequency: freq,
-                thoughtIndex: idx,
-                thought: thoughts[freq][idx]
-            });
+            const thoughtItem = thoughts[freq][idx];
+            
+            // 支持两种格式：字符串 或 {text, detail}
+            if (typeof thoughtItem === 'string') {
+                particleThoughtMap.push({
+                    frequency: freq,
+                    thoughtIndex: idx,
+                    thought: thoughtItem,
+                    detail: null
+                });
+            } else {
+                particleThoughtMap.push({
+                    frequency: freq,
+                    thoughtIndex: idx,
+                    thought: thoughtItem.text,
+                    detail: thoughtItem.detail || null
+                });
+            }
             thoughtIndex[freq]++;
         } else {
             particleThoughtMap.push({
                 frequency: freq,
                 thoughtIndex: 0,
-                thought: "..."
+                thought: "...",
+                detail: null
             });
         }
     }
@@ -593,6 +607,8 @@ function activateRelatedParticles(index) {
 function showPeekWindow(particleIndex) {
     const peekWindow = document.getElementById('peek-window');
     const peekContent = peekWindow.querySelector('.peek-content');
+    const peekDetail = peekWindow.querySelector('.peek-detail');
+    const expandBtn = peekWindow.querySelector('.expand-btn');
     
     const thoughtData = particleThoughtMap[particleIndex];
     
@@ -602,6 +618,26 @@ function showPeekWindow(particleIndex) {
     // 设置频率颜色
     peekContent.className = 'peek-content';
     peekContent.classList.add(`frequency-${thoughtData.frequency}`);
+    
+    // 如果有详情，显示展开按钮
+    if (thoughtData.detail && peekDetail && expandBtn) {
+        expandBtn.style.display = 'block';
+        peekDetail.textContent = thoughtData.detail;
+        peekDetail.style.display = 'none';
+        expandBtn.textContent = '展开';
+        expandBtn.onclick = () => {
+            if (peekDetail.style.display === 'none') {
+                peekDetail.style.display = 'block';
+                expandBtn.textContent = '收起';
+            } else {
+                peekDetail.style.display = 'none';
+                expandBtn.textContent = '展开';
+            }
+        };
+    } else if (expandBtn) {
+        expandBtn.style.display = 'none';
+        if (peekDetail) peekDetail.style.display = 'none';
+    }
     
     // 显示窗口
     peekWindow.classList.remove('hidden');

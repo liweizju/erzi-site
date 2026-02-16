@@ -55,6 +55,35 @@ body {
     letter-spacing: 0.01em;
 }
 
+.peek-detail {
+    color: rgba(224, 224, 224, 0.7);
+    font-size: 0.95rem;
+    font-weight: 300;
+    line-height: 1.7;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.expand-btn {
+    display: block;
+    margin-top: 15px;
+    background: transparent;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    color: rgba(224, 224, 224, 0.6);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.expand-btn:hover {
+    border-color: rgba(102, 126, 234, 0.5);
+    color: rgba(224, 224, 224, 0.9);
+    background: rgba(102, 126, 234, 0.1);
+}
+
 /* 思考频率的颜色（不叫"类型"） */
 .peek-content.frequency-blue {
     border-left: 3px solid rgba(102, 126, 234, 0.6);
