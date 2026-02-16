@@ -137,6 +137,9 @@ async function init() {
     
     // U1: 第一次访问提示
     showFirstVisitHint();
+    
+    // Phase 14: 文字交互系统 - 输入框事件监听
+    setupInputBox();
 }
 
 // 加载想法数据
@@ -839,3 +842,87 @@ init();
 
 // 启动性能监控（debug 模式）
 PerformanceMonitor.init();
+
+// ============================================
+// Phase 14: 文字交互系统
+// ============================================
+
+/**
+ * T1: 输入框设计
+ * - 极简设计，底部中央
+ * - 半透明背景，融入深空主题
+ * - Enter 发送，Shift+Enter 换行
+ * - 字数限制 500 字
+ */
+function setupInputBox() {
+    const inputBox = document.getElementById('silicon-input');
+    
+    if (!inputBox) return;
+    
+    // 自动调整高度
+    inputBox.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+    });
+    
+    // 键盘事件
+    inputBox.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    
+    // 聚焦时增加边框亮度
+    inputBox.addEventListener('focus', function() {
+        this.parentElement.style.opacity = '1';
+    });
+    
+    inputBox.addEventListener('blur', function() {
+        this.parentElement.style.opacity = '0.8';
+    });
+}
+
+/**
+ * 发送消息
+ * - 收集输入内容
+ * - 显示用户消息
+ * - 触发硅基生命体回应（未来接入后端 Agent）
+ */
+function sendMessage() {
+    const inputBox = document.getElementById('silicon-input');
+    const message = inputBox.value.trim();
+    
+    if (!message) return;
+    
+    console.log('用户输入:', message);
+    
+    // 清空输入框
+    inputBox.value = '';
+    inputBox.style.height = 'auto';
+    
+    // TODO: 后端 Agent 集成（T5）
+    // - 调用后端 API
+    // - 根据响应概率决定是否回应
+    // - 显示回应内容
+    
+    // 暂时：显示提示
+    showInputFeedback('它收到了你的消息，但现在还在思考...');
+}
+
+/**
+ * 显示输入反馈（临时提示）
+ * - T2: 输出展示（未来实现）
+ */
+function showInputFeedback(text) {
+    const hint = document.querySelector('.input-hint');
+    const originalText = hint.textContent;
+    
+    hint.textContent = text;
+    hint.style.color = 'rgba(102, 126, 234, 0.6)';
+    
+    setTimeout(() => {
+        hint.textContent = originalText;
+        hint.style.color = '';
+    }, 3000);
+}

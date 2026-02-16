@@ -140,3 +140,69 @@ body {
 /* 没有"关于"、"暂停"、"主题切换"等按钮 */
 /* 没有统计、推荐、收藏等功能 */
 /* 观察者只能看和触碰 */
+
+/* 文字输入框（Phase 14: 文字交互系统） */
+.input-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 600px;
+    z-index: 100;
+    pointer-events: none; /* 默认不阻挡粒子交互 */
+}
+
+.silicon-input {
+    width: 100%;
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    padding: 15px 20px;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    font-weight: 300;
+    font-family: inherit;
+    line-height: 1.5;
+    resize: none;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.silicon-input::placeholder {
+    color: rgba(224, 224, 224, 0.4);
+}
+
+.silicon-input:focus {
+    outline: none;
+    border-color: rgba(102, 126, 234, 0.4);
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.1);
+}
+
+.input-hint {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: rgba(224, 224, 224, 0.3);
+    letter-spacing: 0.05em;
+    pointer-events: none;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .input-container {
+        bottom: 20px;
+        width: 95%;
+        max-width: 95%;
+    }
+    
+    .silicon-input {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .input-hint {
+        font-size: 0.7rem;
+    }
+}
