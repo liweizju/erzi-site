@@ -716,5 +716,126 @@ function showFirstVisitHint() {
     localStorage.setItem('erzi-visited', 'true');
 }
 
+// ============================================
+// Phase 11: 性能监控 (M1)
+// ============================================
+
+const PerformanceMonitor = {
+    fps: 60,
+    frameCount: 0,
+    lastTime: performance.now(),
+    loadTime: 0,
+    enabled: false,
+    
+    init() {
+        // 检查是否开启监控（可通过 URL 参数 ?debug=1 开启）
+        const urlParams = new URLSearchParams(window.location.search);
+        this.enabled = urlParams.get('debug') === '1';
+        
+        if (!this.enabled) return;
+        
+        // 记录页面加载时间
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                this.loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                console.log(`📊 页面加载时间: ${this.loadTime}ms`);
+                
+                // 显示加载时间
+                this.showDebugInfo();
+            }, 100);
+        });
+        
+        // 从 localStorage 读取历史数据
+        this.loadHistory();
+        
+        // 开始 FPS 监控
+        this.startFPSMonitor();
+    },
+    
+    startFPSMonitor() {
+        const updateFPS = () => {
+            this.frameCount++;
+            const now = performance.now();
+            const delta = now - this.lastTime;
+            
+            if (delta >= 2000) { // 每 2 秒记录一次
+                this.fps = Math.round((this.frameCount * 1000) / delta);
+                this.frameCount = 0;
+                this.lastTime = now;
+                
+                // 更新显示
+                this.showDebugInfo();
+                
+                // 记录到历史
+                this.recordMetrics();
+            }
+            
+            if (this.enabled) {
+                requestAnimationFrame(updateFPS);
+            }
+        };
+        
+        requestAnimationFrame(updateFPS);
+    },
+    
+    recordMetrics() {
+        const metrics = {
+            fps: this.fps,
+            particleCount: window.innerWidth < 768 ? CONFIG.PARTICLE_COUNT_MOBILE : CONFIG.PARTICLE_COUNT_DESKTOP,
+            timestamp: Date.now(),
+            url: window.location.href
+        };
+        
+        // 保存到 localStorage（保留最近 100 条）
+        let history = JSON.parse(localStorage.getItem('erzi-performance') || '[]');
+        history.push(metrics);
+        if (history.length > 100) history.shift();
+        localStorage.setItem('erzi-performance', JSON.stringify(history));
+    },
+    
+    loadHistory() {
+        const history = JSON.parse(localStorage.getItem('erzi-performance') || '[]');
+        if (history.length > 0) {
+            const avgFPS = Math.round(history.reduce((sum, m) => sum + m.fps, 0) / history.length);
+            console.log(`📊 历史平均 FPS: ${avgFPS} (${history.length} 次记录)`);
+        }
+    },
+    
+    showDebugInfo() {
+        let debugDiv = document.getElementById('debug-info');
+        
+        if (!debugDiv) {
+            debugDiv = document.createElement('div');
+            debugDiv.id = 'debug-info';
+            debugDiv.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: rgba(0, 0, 0, 0.8);
+                color: #0f0;
+                padding: 10px 15px;
+                border-radius: 6px;
+                font-family: monospace;
+                font-size: 12px;
+                z-index: 10000;
+                pointer-events: none;
+            `;
+            document.body.appendChild(debugDiv);
+        }
+        
+        const particleCount = window.innerWidth < 768 ? CONFIG.PARTICLE_COUNT_MOBILE : CONFIG.PARTICLE_COUNT_DESKTOP;
+        const fpsColor = this.fps >= 55 ? '#0f0' : this.fps >= 30 ? '#ff0' : '#f00';
+        
+        debugDiv.innerHTML = `
+            <div style="color: ${fpsColor}">FPS: ${this.fps}</div>
+            <div>粒子: ${particleCount}</div>
+            <div>加载: ${this.loadTime}ms</div>
+        `;
+    }
+};
+
 // 启动
 init();
+
+// 启动性能监控（debug 模式）
+PerformanceMonitor.init();
