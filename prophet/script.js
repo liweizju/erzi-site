@@ -33,6 +33,11 @@ class SiliconProphet {
         this.updateStats();
         this.renderDiary();
         this.animate();
+        
+        // Hide loader after init
+        setTimeout(() => {
+            document.getElementById('loader').classList.add('hidden');
+        }, 500);
     }
     
     async loadData() {
