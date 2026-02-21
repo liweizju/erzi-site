@@ -1,0 +1,93 @@
+/* 硅基生命体 v2.0 - 视觉样式 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: #0a0a0f;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#canvas-container {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* 窥视窗口 */
+.peek-window {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: 12px;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(102, 126, 234, 0.1);
+    padding: 40px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.peek-window.hidden {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+    pointer-events: none;
+}
+
+.peek-content {
+    color: #e0e0e0;
+    font-size: 1.25rem;
+    font-weight: 300;
+    line-height: 1.8;
+    letter-spacing: 0.01em;
+}
+
+/* 思考频率的颜色（不叫"类型"） */
+.peek-content.frequency-blue {
+    border-left: 3px solid rgba(102, 126, 234, 0.6);
+    padding-left: 20px;
+}
+
+.peek-content.frequency-purple {
+    border-left: 3px solid rgba(118, 75, 162, 0.6);
+    padding-left: 20px;
+}
+
+.peek-content.frequency-cyan {
+    border-left: 3px solid rgba(72, 187, 120, 0.6);
+    padding-left: 20px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .peek-window {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        padding: 30px 20px;
+    }
+    
+    .peek-content {
+        font-size: 1.1rem;
+    }
+}
+
+/* 隐藏所有UI元素（不是网站，是存在空间） */
+/* 没有"关于"、"暂停"、"主题切换"等按钮 */
+/* 没有统计、推荐、收藏等功能 */
+/* 观察者只能看和触碰 */
