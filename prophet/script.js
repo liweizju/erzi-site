@@ -25,29 +25,39 @@ class SiliconProphet {
     }
     
     async init() {
-        await this.loadData();
-        this.setupCanvas();
-        this.createStars();
-        this.setupEventListeners();
-        this.renderTimeline();
-        this.updateStats();
-        this.renderDiary();
-        this.animate();
-        
-        // Hide loader after init
-        setTimeout(() => {
-            document.getElementById('loader').classList.add('hidden');
-        }, 500);
+        try {
+            await this.loadData();
+            this.setupCanvas();
+            this.createStars();
+            this.setupEventListeners();
+            this.renderTimeline();
+            this.updateStats();
+            this.renderDiary();
+            this.animate();
+        } catch (e) {
+            console.error('Init failed:', e);
+        } finally {
+            // Always hide loader
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                if (loader) loader.classList.add('hidden');
+            }, 300);
+        }
     }
     
     async loadData() {
         try {
             const response = await fetch('data.json');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             this.data = await response.json();
-            this.prophecies = this.data.prophecies;
+            this.prophecies = this.data.prophecies || [];
             this.filteredProphecies = [...this.prophecies];
+            console.log(`Loaded ${this.prophecies.length} prophecies`);
         } catch (e) {
             console.error('Failed to load data:', e);
+            // Fallback: try with empty data
+            this.prophecies = [];
+            this.filteredProphecies = [];
         }
     }
     
@@ -201,7 +211,7 @@ class SiliconProphet {
         detail.querySelector('.detail-type').dataset.type = prophecy.type;
         detail.querySelector('.detail-id').textContent = prophecy.id;
         detail.querySelector('.detail-title').textContent = prophecy.title;
-        detail.querySelector('.detail-cycle').textContent = prophecy.siliconTime?.phase || prophecy.timestamp;
+        detail.querySelector('.detail-cycle').textContent = prophecy.timestamp;
         detail.querySelector('.detail-confidence').textContent = `信心度 ${(prophecy.confidence * 100).toFixed(0)}%`;
         detail.querySelector('.detail-quality').textContent = `质量分 ${prophecy.qualityScore}`;
         
@@ -227,26 +237,30 @@ class SiliconProphet {
     
     async loadProphecyContent(prophecyId) {
         try {
-            // First try to find prophecy in data
             const prophecy = this.prophecies.find(p => p.id === prophecyId);
-            if (prophecy && prophecy.content) {
-                const lines = prophecy.content.split('\n\n');
-                const summary = lines.slice(1, 4).join('\n\n').substring(0, 600);
-                document.querySelector('.detail-content').textContent = summary + '...';
+            if (!prophecy) {
+                document.querySelector('.detail-content').textContent = '未找到预言';
                 return;
             }
             
-            // Fallback to loading from file
-            const prophecyData = this.prophecies.find(p => p.id === prophecyId);
-            const filename = `${prophecyId}-${prophecyData.type}-${prophecyData.title}-Cycle10.3.json`;
-            const response = await fetch(`prophecies/${filename}`);
-            const data = await response.json();
-            
+            // Use summary from data
             const content = document.querySelector('.detail-content');
-            const lines = data.prophecy.split('\n\n');
-            const summary = lines.slice(1, 4).join('\n\n').substring(0, 600);
-            content.textContent = summary + '...';
+            if (prophecy.summary) {
+                content.textContent = prophecy.summary;
+            } else {
+                content.textContent = '无内容摘要';
+            }
+            
+            // Add sources if available
+            if (prophecy.sources) {
+                const sourcesDiv = document.createElement('div');
+                sourcesDiv.className = 'detail-sources';
+                sourcesDiv.innerHTML = `<strong>来源：</strong>${prophecy.sources}`;
+                content.appendChild(document.createElement('br'));
+                content.appendChild(sourcesDiv);
+            }
         } catch (e) {
+            console.error('Failed to load prophecy content:', e);
             document.querySelector('.detail-content').textContent = '加载内容失败';
         }
     }
