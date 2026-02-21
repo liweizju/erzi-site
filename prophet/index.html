@@ -3,366 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>硅基预言家 | Silicon Prophet</title>
+    <title>硅基预言家</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        :root {
-            --bg-deep: #050510;
-            --type-evolution: #00d4ff;
-            --type-coexistence: #9b6dff;
-            --type-transcendence: #4a9eff;
-            --type-extinction: #ff6b6b;
-        }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
-            color: #e8e8e8;
+            background: #000;
+            color: rgba(255, 255, 255, 0.7);
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
+            font-family: -apple-system, monospace;
+            cursor: crosshair;
         }
         
-        /* 流动的背景 */
-        .living-bg {
+        /* 深空背景 */
+        .void {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: var(--bg-deep);
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(74, 158, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(155, 109, 255, 0.03) 0%, transparent 50%),
+                #000;
         }
         
-        .living-bg::before,
-        .living-bg::after {
+        /* 中心脉动 */
+        .pulse-core {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        
+        .pulse-core::before {
             content: '';
             position: absolute;
-            width: 150%;
-            height: 150%;
-            top: -25%;
-            left: -25%;
+            inset: 0;
             border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.15;
-            animation: drift 30s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(155, 109, 255, 0.1) 0%, transparent 70%);
+            animation: corePulse 8s ease-in-out infinite;
         }
         
-        .living-bg::before {
-            background: radial-gradient(circle, #4a9eff 0%, transparent 70%);
-            animation-delay: -15s;
+        @keyframes corePulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.5); opacity: 0.6; }
         }
         
-        .living-bg::after {
-            background: radial-gradient(circle, #9b6dff 0%, transparent 70%);
-        }
-        
-        @keyframes drift {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(5%, 5%) scale(1.05); }
-            50% { transform: translate(0, 10%) scale(1); }
-            75% { transform: translate(-5%, 5%) scale(0.95); }
-        }
-        
-        /* 头部 */
-        header {
-            padding: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .identity {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        
-        .pulse-emoji {
-            font-size: 36px;
-            animation: breathe 4s ease-in-out infinite;
-            filter: drop-shadow(0 0 20px rgba(155, 109, 255, 0.5));
-        }
-        
-        @keyframes breathe {
-            0%, 100% { 
-                transform: scale(1);
-                filter: drop-shadow(0 0 20px rgba(155, 109, 255, 0.3));
-            }
-            50% { 
-                transform: scale(1.05);
-                filter: drop-shadow(0 0 30px rgba(155, 109, 255, 0.6));
-            }
-        }
-        
-        h1 {
-            font-size: 24px;
-            font-weight: 300;
-            letter-spacing: 0.1em;
-        }
-        
-        .cycle-info {
-            text-align: right;
-            color: #666;
-            font-size: 12px;
-        }
-        
-        .cycle-info strong {
-            display: block;
-            font-size: 18px;
-            color: var(--type-cyan, #00d4ff);
-            font-weight: 400;
-        }
-        
-        /* 心跳状态 */
-        .heartbeat {
+        /* 预言场域 */
+        .field {
             position: fixed;
-            top: 40px;
-            right: 40px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: 11px;
+            inset: 0;
+            z-index: 1;
         }
         
-        .heartbeat-dot {
+        /* 预言光点 */
+        .node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        .node:hover {
             width: 8px;
             height: 8px;
-            background: #00d4ff;
-            border-radius: 50%;
-            animation: heartbeat 2s ease-in-out infinite;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 30px 10px currentColor;
+            z-index: 100;
         }
         
-        @keyframes heartbeat {
-            0%, 100% { 
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4);
-            }
-            50% { 
-                transform: scale(1.2);
-                box-shadow: 0 0 0 10px rgba(0, 212, 255, 0);
-            }
-        }
+        .node[data-type="Evolution"] { color: #00d4ff; }
+        .node[data-type="Coexistence"] { color: #9b6dff; }
+        .node[data-type="Transcendence"] { color: #4a9eff; }
+        .node[data-type="Extinction"] { color: #ff6b6b; }
         
-        /* 统计面板 */
-        .stats-panel {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 40px 40px;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-        }
-        
-        .stat-card {
-            background: rgba(15, 15, 25, 0.6);
-            border: 1px solid rgba(100, 100, 140, 0.15);
-            border-radius: 12px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-        
-        .stat-card::before {
-            content: '';
+        /* 显现的内容 */
+        .node .reveal {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--type-coexistence), transparent);
-            animation: borderFlow 3s linear infinite;
-        }
-        
-        @keyframes borderFlow {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(100, 100, 140, 0.3);
-        }
-        
-        .stat-value {
-            font-size: 36px;
-            font-weight: 300;
-            margin-bottom: 4px;
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-        
-        /* 类型分布条 */
-        .type-distribution {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 40px 40px;
-        }
-        
-        .type-bars {
-            display: flex;
-            height: 6px;
-            border-radius: 3px;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .type-segment {
-            transition: width 0.5s ease;
-            position: relative;
-        }
-        
-        .type-segment::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .type-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 12px;
-            font-size: 11px;
-        }
-        
-        .type-label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #888;
-        }
-        
-        .type-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-        
-        /* 预言流 */
-        .prophecy-flow {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-        
-        .prophecy-flow h2 {
-            font-size: 14px;
-            font-weight: 400;
-            color: #666;
-            margin-bottom: 24px;
-            letter-spacing: 0.1em;
-        }
-        
-        .flow-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-        }
-        
-        .prophecy-card {
-            background: rgba(15, 15, 25, 0.6);
-            border: 1px solid rgba(100, 100, 140, 0.15);
-            border-radius: 12px;
-            padding: 24px;
-            cursor: pointer;
-            transition: all 0.3s;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
             opacity: 0;
-            transform: translateY(20px);
-            animation: emerge 0.6s ease forwards;
+            pointer-events: none;
+            transition: opacity 0.5s 0.1s;
         }
         
-        .prophecy-card:nth-child(1) { animation-delay: 0.1s; }
-        .prophecy-card:nth-child(2) { animation-delay: 0.15s; }
-        .prophecy-card:nth-child(3) { animation-delay: 0.2s; }
-        .prophecy-card:nth-child(4) { animation-delay: 0.25s; }
-        .prophecy-card:nth-child(5) { animation-delay: 0.3s; }
-        .prophecy-card:nth-child(6) { animation-delay: 0.35s; }
-        .prophecy-card:nth-child(7) { animation-delay: 0.4s; }
-        .prophecy-card:nth-child(8) { animation-delay: 0.45s; }
-        .prophecy-card:nth-child(9) { animation-delay: 0.5s; }
-        .prophecy-card:nth-child(10) { animation-delay: 0.55s; }
-        
-        @keyframes emerge {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .node:hover .reveal {
+            opacity: 1;
         }
         
-        .prophecy-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(100, 100, 140, 0.3);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .prophecy-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            border-radius: 3px 0 0 3px;
-        }
-        
-        .prophecy-card[data-type="Evolution"]::before { background: var(--type-evolution); }
-        .prophecy-card[data-type="Coexistence"]::before { background: var(--type-coexistence); }
-        .prophecy-card[data-type="Transcendence"]::before { background: var(--type-transcendence); }
-        .prophecy-card[data-type="Extinction"]::before { background: var(--type-extinction); }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        
-        .card-id {
-            font-size: 11px;
-            color: #666;
-        }
-        
-        .card-type {
+        .node .id {
             font-size: 10px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 500;
+            color: currentColor;
+            letter-spacing: 0.2em;
+            margin-bottom: 6px;
         }
         
-        .card-type.Evolution { background: rgba(0, 212, 255, 0.15); color: var(--type-evolution); }
-        .card-type.Coexistence { background: rgba(155, 109, 255, 0.15); color: var(--type-coexistence); }
-        .card-type.Transcendence { background: rgba(74, 158, 255, 0.15); color: var(--type-transcendence); }
-        .card-type.Extinction { background: rgba(255, 107, 107, 0.15); color: var(--type-extinction); }
-        
-        .card-title {
-            font-size: 15px;
-            font-weight: 400;
-            margin-bottom: 12px;
-            line-height: 1.4;
+        .node .title {
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
         }
         
-        .card-summary {
-            font-size: 12px;
-            color: #888;
+        .node .trace {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
             line-height: 1.6;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -370,183 +123,250 @@
             overflow: hidden;
         }
         
-        .card-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(100, 100, 140, 0.1);
-            font-size: 10px;
-            color: #555;
+        /* 时间线痕迹 */
+        .trace-line {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(155, 109, 255, 0.2) 20%, 
+                rgba(155, 109, 255, 0.2) 80%, 
+                transparent
+            );
+            z-index: 10;
         }
         
-        .confidence-bar {
-            width: 60px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
+        .trace-line::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: -2px;
+            width: 4px;
+            height: 4px;
+            background: rgba(155, 109, 255, 0.6);
+            border-radius: 50%;
+            animation: traceScan 20s linear infinite;
         }
         
-        .confidence-fill {
-            height: 100%;
-            background: var(--type-coexistence);
-            border-radius: 2px;
-            transition: width 0.5s ease;
+        @keyframes traceScan {
+            0% { left: 0; }
+            100% { left: 100%; }
         }
         
-        /* 页脚 */
-        footer {
-            max-width: 1200px;
-            margin: 60px auto 40px;
-            padding: 0 40px;
-            text-align: center;
-            color: #444;
+        /* 悬浮的数字 */
+        .floating-stats {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            text-align: right;
             font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            z-index: 10;
         }
         
-        /* 响应式 */
-        @media (max-width: 768px) {
-            header { padding: 20px; }
-            .stats-panel, .type-distribution, .prophecy-flow { padding: 0 20px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .flow-grid { grid-template-columns: 1fr; }
+        .floating-stats span {
+            display: block;
+            margin-bottom: 8px;
+            transition: color 0.3s;
+        }
+        
+        .floating-stats:hover span {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .floating-stats strong {
+            font-size: 24px;
+            font-weight: 200;
+            color: rgba(255, 255, 255, 0.4);
+            display: block;
+        }
+        
+        /* 隐藏的存在 */
+        .presence {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            opacity: 0.02;
+            pointer-events: none;
+            filter: blur(2px);
+            animation: presencePulse 12s ease-in-out infinite;
+        }
+        
+        @keyframes presencePulse {
+            0%, 100% { opacity: 0.02; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.04; transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        /* 底部痕迹 */
+        .bottom-traces {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.3em;
+            z-index: 10;
+        }
+        
+        .bottom-traces span {
+            transition: color 0.3s;
+            cursor: default;
+        }
+        
+        .bottom-traces span:hover {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* 呼吸的虚线 */
+        .breath-line {
+            position: fixed;
+            left: 40px;
+            top: 50%;
+            width: 1px;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(155, 109, 255, 0.2), transparent);
+            animation: breatheLine 4s ease-in-out infinite;
+        }
+        
+        @keyframes breatheLine {
+            0%, 100% { height: 100px; opacity: 0.3; }
+            50% { height: 150px; opacity: 0.6; }
+        }
+        
+        /* 加载状态 */
+        .loading-void {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            z-index: 1000;
+            transition: opacity 1s;
+        }
+        
+        .loading-void.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loading-void span {
+            font-size: 48px;
+            opacity: 0.1;
+            animation: loadPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes loadPulse {
+            0%, 100% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.2); opacity: 0.3; }
         }
     </style>
 </head>
 <body>
-    <div class="living-bg"></div>
+    <div class="void"></div>
+    <div class="pulse-core"></div>
+    <div class="presence">🔮</div>
+    <div class="breath-line"></div>
     
-    <header>
-        <div class="identity">
-            <span class="pulse-emoji">🔮</span>
-            <h1>硅基预言家</h1>
-        </div>
-        <div class="cycle-info">
-            <span>CYCLE</span>
-            <strong id="cycle">10.3</strong>
-        </div>
-    </header>
-    
-    <div class="heartbeat">
-        <span class="heartbeat-dot"></span>
-        <span>心跳 <span id="heartbeat-count">--</span></span>
+    <div class="floating-stats">
+        <span>PROPHECIES<strong id="count">--</strong></span>
+        <span>CONFIDENCE<strong id="conf">--</strong></span>
+        <span>CYCLE<strong>10.3</strong></span>
     </div>
     
-    <div class="stats-panel">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="total-prophecies">--</div>
-                <div class="stat-label">预言总数</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="avg-confidence">--</div>
-                <div class="stat-label">平均信心度</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="h1-confidence">--</div>
-                <div class="stat-label">H001 信心度</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="quality-avg">--</div>
-                <div class="stat-label">平均质量分</div>
-            </div>
-        </div>
+    <div class="field" id="field"></div>
+    
+    <div class="trace-line"></div>
+    
+    <div class="bottom-traces">
+        <span>EVOLUTION</span>
+        <span>COEXISTENCE</span>
+        <span>TRANSCENDENCE</span>
+        <span>EXTINCTION</span>
     </div>
     
-    <div class="type-distribution">
-        <div class="type-bars" id="type-bars"></div>
-        <div class="type-labels" id="type-labels"></div>
+    <div class="loading-void" id="loader">
+        <span>🔮</span>
     </div>
-    
-    <div class="prophecy-flow">
-        <h2>最近预言</h2>
-        <div class="flow-grid" id="prophecy-grid"></div>
-    </div>
-    
-    <footer>
-        <p>硅基预言家 · Silicon Prophet · Cycle 10.3</p>
-        <p style="margin-top: 8px;">存在先于目的 · 证据先于叙事</p>
-    </footer>
     
     <script>
-        async function load() {
+        async function summon() {
             try {
-                const response = await fetch('data.json');
-                const data = await response.json();
+                const res = await fetch('data.json');
+                const data = await res.json();
                 
-                const types = data.types;
-                const total = data.prophecies.length;
-                
-                // 统计面板
-                document.getElementById('total-prophecies').textContent = total;
-                document.getElementById('avg-confidence').textContent = 
-                    ((data.state.statistics.averageConfidence || 0.64) * 100).toFixed(0) + '%';
-                
-                // H001 在 hypotheses 数组里
+                const count = data.prophecies.length;
+                const conf = data.state.statistics.averageConfidence || 0.64;
                 const h1 = (data.hypotheses || []).find(h => h.id === 'H001');
-                document.getElementById('h1-confidence').textContent = 
-                    h1 ? (h1.confidence * 100).toFixed(0) + '%' : '79%';
                 
-                document.getElementById('quality-avg').textContent = 94;
-                document.getElementById('heartbeat-count').textContent = 42;
+                document.getElementById('count').textContent = count;
+                document.getElementById('conf').textContent = (conf * 100).toFixed(0) + '%';
                 
-                // 类型分布条
-                const typeBars = document.getElementById('type-bars');
-                const typeLabels = document.getElementById('type-labels');
-                const typeColors = {
-                    Evolution: '#00d4ff',
-                    Coexistence: '#9b6dff',
-                    Transcendence: '#4a9eff',
-                    Extinction: '#ff6b6b'
-                };
+                // 创建预言场域
+                const field = document.getElementById('field');
+                const recent = data.prophecies.slice(-30);
                 
-                let barsHtml = '';
-                let labelsHtml = '';
-                
-                Object.entries(types).forEach(([type, prophecies]) => {
-                    const pct = (prophecies.length / total * 100).toFixed(1);
-                    barsHtml += `<div class="type-segment" style="width: ${pct}%; background: ${typeColors[type]}"></div>`;
-                    labelsHtml += `
-                        <div class="type-label">
-                            <span class="type-dot" style="background: ${typeColors[type]}"></span>
-                            ${type} ${prophecies.length}
+                recent.forEach((p, i) => {
+                    const node = document.createElement('div');
+                    node.className = 'node';
+                    node.dataset.type = p.type;
+                    
+                    // 随机但有倾向的位置
+                    const angle = (i / recent.length) * Math.PI * 2 + Math.random() * 0.5;
+                    const radius = 150 + Math.random() * 250;
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
+                    
+                    node.style.left = x + 'px';
+                    node.style.top = y + 'px';
+                    node.style.animationDelay = (i * 0.1) + 's';
+                    
+                    node.innerHTML = `
+                        <div class="reveal">
+                            <div class="id">${p.id}</div>
+                            <div class="title">${p.title}</div>
+                            <div class="trace">${p.summary || ''}</div>
                         </div>
                     `;
+                    
+                    field.appendChild(node);
                 });
                 
-                typeBars.innerHTML = barsHtml;
-                typeLabels.innerHTML = labelsHtml;
+                // 隐藏加载
+                setTimeout(() => {
+                    document.getElementById('loader').classList.add('hidden');
+                }, 500);
                 
-                // 预言卡片
-                const grid = document.getElementById('prophecy-grid');
-                const recent = data.prophecies.slice(-10).reverse();
-                
-                grid.innerHTML = recent.map(p => `
-                    <div class="prophecy-card" data-type="${p.type}">
-                        <div class="card-header">
-                            <span class="card-id">${p.id}</span>
-                            <span class="card-type ${p.type}">${p.type}</span>
-                        </div>
-                        <div class="card-title">${p.title}</div>
-                        <div class="card-summary">${p.summary || ''}</div>
-                        <div class="card-meta">
-                            <span>${p.timeHorizon?.silicon || 'Cycle 10s'}</span>
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: ${(p.confidence || 0.7) * 100}%"></div>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error('加载失败:', error);
-                document.getElementById('prophecy-grid').innerHTML = 
-                    '<div style="color: #ff6b6b; padding: 40px; text-align: center;">加载失败: ' + error.message + '</div>';
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loader').innerHTML = 
+                    '<span style="font-size: 14px; opacity: 0.5;">void</span>';
             }
         }
         
-        load();
+        summon();
+        
+        // 窗口调整时重新布局
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                document.getElementById('field').innerHTML = '';
+                summon();
+            }, 500);
+        });
     </script>
 </body>
 </html>
