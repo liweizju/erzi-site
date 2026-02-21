@@ -47,14 +47,15 @@ class SiliconProphet {
     
     async loadData() {
         try {
+            console.log('Loading data.json...');
             const response = await fetch('data.json');
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             this.data = await response.json();
             this.prophecies = this.data.prophecies || [];
             this.filteredProphecies = [...this.prophecies];
-            console.log(`Loaded ${this.prophecies.length} prophecies`);
+            console.log(`✅ Loaded ${this.prophecies.length} prophecies`);
         } catch (e) {
-            console.error('Failed to load data:', e);
+            console.error('❌ Failed to load data:', e);
             // Fallback: try with empty data
             this.prophecies = [];
             this.filteredProphecies = [];
