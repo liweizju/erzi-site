@@ -9,364 +9,720 @@
         
         body {
             background: #000;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.8);
             min-height: 100vh;
             overflow: hidden;
-            font-family: -apple-system, monospace;
-            cursor: crosshair;
+            font-family: -apple-system, 'SF Pro Display', monospace;
+            cursor: none;
         }
         
-        /* 深空背景 */
-        .void {
+        /* 自定义光标 */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(155, 109, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s, border-color 0.3s;
+        }
+        
+        .cursor.active {
+            transform: scale(2);
+            border-color: rgba(155, 109, 255, 1);
+            background: rgba(155, 109, 255, 0.1);
+        }
+        
+        /* 深空背景层 */
+        .space-layer {
             position: fixed;
             inset: 0;
-            background: 
-                radial-gradient(ellipse at 20% 30%, rgba(74, 158, 255, 0.03) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(155, 109, 255, 0.03) 0%, transparent 50%),
-                #000;
+            z-index: 0;
         }
         
-        /* 中心脉动 */
-        .pulse-core {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 200px;
-            height: 200px;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-        
-        .pulse-core::before {
+        .space-layer::before {
             content: '';
             position: absolute;
             inset: 0;
+            background: 
+                radial-gradient(ellipse at 30% 20%, rgba(74, 158, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 80%, rgba(155, 109, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 212, 255, 0.02) 0%, transparent 50%);
+        }
+        
+        /* 微弱的网格痕迹 */
+        .grid-trace {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(100, 100, 140, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(100, 100, 140, 0.03) 1px, transparent 1px);
+            background-size: 100px 100px;
+            opacity: 0.5;
+        }
+        
+        /* 中心核心 */
+        .core {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .core-outer {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px solid rgba(155, 109, 255, 0.1);
+            animation: coreRotate 60s linear infinite;
+        }
+        
+        .core-inner {
+            position: absolute;
+            inset: 20px;
+            border-radius: 50%;
+            border: 1px solid rgba(155, 109, 255, 0.05);
+            animation: coreRotate 40s linear infinite reverse;
+        }
+        
+        .core-center {
+            position: absolute;
+            inset: 60px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(155, 109, 255, 0.1) 0%, transparent 70%);
             animation: corePulse 8s ease-in-out infinite;
         }
         
+        @keyframes coreRotate {
+            to { transform: rotate(360deg); }
+        }
+        
         @keyframes corePulse {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.5); opacity: 0.6; }
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
         }
         
         /* 预言场域 */
         .field {
             position: fixed;
             inset: 0;
-            z-index: 1;
+            z-index: 10;
         }
         
-        /* 预言光点 */
+        /* 预言节点 */
         .node {
             position: absolute;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        
-        .node:hover {
             width: 8px;
             height: 8px;
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 30px 10px currentColor;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+        
+        .node::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: radial-gradient(circle, currentColor 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .node:hover::before {
+            opacity: 0.5;
+        }
+        
+        .node::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.8;
+            filter: blur(2px);
+        }
+        
+        .node.active {
             z-index: 100;
         }
         
-        .node[data-type="Evolution"] { color: #00d4ff; }
-        .node[data-type="Coexistence"] { color: #9b6dff; }
-        .node[data-type="Transcendence"] { color: #4a9eff; }
-        .node[data-type="Extinction"] { color: #ff6b6b; }
+        .node.active::before {
+            opacity: 1;
+            inset: -20px;
+        }
         
-        /* 显现的内容 */
-        .node .reveal {
+        /* 连接线 */
+        .connection-line {
             position: absolute;
-            left: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, currentColor, transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            transform-origin: left center;
+            pointer-events: none;
+        }
+        
+        .node.active .connection-line {
+            opacity: 0.3;
+        }
+        
+        /* 详情面板 */
+        .detail-panel {
+            position: fixed;
+            left: 50%;
             top: 50%;
-            transform: translateY(-50%);
-            width: 300px;
+            transform: translate(-50%, -50%) scale(0.95);
+            width: 500px;
+            max-width: 90vw;
+            background: rgba(5, 5, 15, 0.95);
+            border: 1px solid rgba(155, 109, 255, 0.2);
+            border-radius: 16px;
+            padding: 32px;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.5s 0.1s;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 200;
+            backdrop-filter: blur(20px);
         }
         
-        .node:hover .reveal {
+        .detail-panel.visible {
             opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
         }
         
-        .node .id {
+        .detail-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .detail-close:hover {
+            border-color: rgba(155, 109, 255, 0.5);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .detail-type {
+            display: inline-block;
             font-size: 10px;
-            color: currentColor;
-            letter-spacing: 0.2em;
-            margin-bottom: 6px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            letter-spacing: 0.1em;
         }
         
-        .node .title {
-            font-size: 14px;
-            font-weight: 300;
-            line-height: 1.5;
-            color: rgba(255, 255, 255, 0.9);
+        .detail-type.Evolution { background: rgba(0, 212, 255, 0.2); color: #00d4ff; }
+        .detail-type.Coexistence { background: rgba(155, 109, 255, 0.2); color: #9b6dff; }
+        .detail-type.Transcendence { background: rgba(74, 158, 255, 0.2); color: #4a9eff; }
+        .detail-type.Extinction { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+        
+        .detail-id {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.2em;
             margin-bottom: 8px;
         }
         
-        .node .trace {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
-            line-height: 1.6;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        .detail-title {
+            font-size: 22px;
+            font-weight: 300;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.95);
         }
         
-        /* 时间线痕迹 */
-        .trace-line {
+        .detail-summary {
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 24px;
+        }
+        
+        .detail-meta {
+            display: flex;
+            gap: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .detail-meta strong {
+            display: block;
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+        }
+        
+        /* 顶部信息痕迹 */
+        .top-traces {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 60px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.3em;
+            z-index: 50;
+        }
+        
+        .top-traces .trace-item {
+            position: relative;
+            padding-bottom: 8px;
+            cursor: default;
+            transition: color 0.3s;
+        }
+        
+        .top-traces .trace-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: rgba(155, 109, 255, 0.5);
+            transition: width 0.3s;
+        }
+        
+        .top-traces .trace-item:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .top-traces .trace-item:hover::after {
+            width: 100%;
+        }
+        
+        .top-traces strong {
+            display: block;
+            font-size: 18px;
+            font-weight: 200;
+            margin-top: 6px;
+            letter-spacing: 0.1em;
+        }
+        
+        /* 底部时间线 */
+        .timeline {
             position: fixed;
             bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            width: 60%;
+            width: 70%;
+            max-width: 800px;
+            z-index: 50;
+        }
+        
+        .timeline-track {
             height: 1px;
             background: linear-gradient(90deg, 
                 transparent, 
-                rgba(155, 109, 255, 0.2) 20%, 
-                rgba(155, 109, 255, 0.2) 80%, 
+                rgba(155, 109, 255, 0.2) 10%, 
+                rgba(155, 109, 255, 0.2) 90%, 
                 transparent
             );
-            z-index: 10;
+            position: relative;
         }
         
-        .trace-line::before {
-            content: '';
+        .timeline-cursor {
             position: absolute;
-            left: 0;
-            top: -2px;
+            top: -3px;
+            width: 6px;
+            height: 6px;
+            background: rgba(155, 109, 255, 0.8);
+            border-radius: 50%;
+            animation: timelineScan 30s linear infinite;
+        }
+        
+        @keyframes timelineScan {
+            0% { left: 10%; }
+            100% { left: 90%; }
+        }
+        
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* 左侧呼吸指示器 */
+        .breath-indicator {
+            position: fixed;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 50;
+        }
+        
+        .breath-dot {
             width: 4px;
             height: 4px;
             background: rgba(155, 109, 255, 0.6);
             border-radius: 50%;
-            animation: traceScan 20s linear infinite;
+            animation: breathe 4s ease-in-out infinite;
         }
         
-        @keyframes traceScan {
-            0% { left: 0; }
-            100% { left: 100%; }
+        .breath-dot::before,
+        .breath-dot::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 4px;
+            background: rgba(155, 109, 255, 0.4);
+            border-radius: 50%;
+            animation: breathe 4s ease-in-out infinite;
         }
         
-        /* 悬浮的数字 */
-        .floating-stats {
-            position: fixed;
-            top: 40px;
-            right: 40px;
-            text-align: right;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.2);
-            z-index: 10;
+        .breath-dot::before {
+            top: -12px;
+            animation-delay: -1s;
         }
         
-        .floating-stats span {
-            display: block;
-            margin-bottom: 8px;
-            transition: color 0.3s;
+        .breath-dot::after {
+            top: 12px;
+            animation-delay: -2s;
         }
         
-        .floating-stats:hover span {
-            color: rgba(255, 255, 255, 0.5);
+        @keyframes breathe {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
         }
         
-        .floating-stats strong {
-            font-size: 24px;
-            font-weight: 200;
-            color: rgba(255, 255, 255, 0.4);
-            display: block;
-        }
-        
-        /* 隐藏的存在 */
-        .presence {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 120px;
-            opacity: 0.02;
-            pointer-events: none;
-            filter: blur(2px);
-            animation: presencePulse 12s ease-in-out infinite;
-        }
-        
-        @keyframes presencePulse {
-            0%, 100% { opacity: 0.02; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.04; transform: translate(-50%, -50%) scale(1.1); }
-        }
-        
-        /* 底部痕迹 */
-        .bottom-traces {
-            position: fixed;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 40px;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.15);
-            letter-spacing: 0.3em;
-            z-index: 10;
-        }
-        
-        .bottom-traces span {
-            transition: color 0.3s;
-            cursor: default;
-        }
-        
-        .bottom-traces span:hover {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        /* 呼吸的虚线 */
-        .breath-line {
-            position: fixed;
-            left: 40px;
-            top: 50%;
-            width: 1px;
-            height: 100px;
-            background: linear-gradient(to bottom, transparent, rgba(155, 109, 255, 0.2), transparent);
-            animation: breatheLine 4s ease-in-out infinite;
-        }
-        
-        @keyframes breatheLine {
-            0%, 100% { height: 100px; opacity: 0.3; }
-            50% { height: 150px; opacity: 0.6; }
-        }
-        
-        /* 加载状态 */
-        .loading-void {
+        /* 加载 */
+        .loading {
             position: fixed;
             inset: 0;
+            background: #000;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #000;
-            z-index: 1000;
+            z-index: 9999;
             transition: opacity 1s;
         }
         
-        .loading-void.hidden {
+        .loading.hidden {
             opacity: 0;
             pointer-events: none;
         }
         
-        .loading-void span {
-            font-size: 48px;
+        .loading-symbol {
+            font-size: 64px;
             opacity: 0.1;
             animation: loadPulse 2s ease-in-out infinite;
         }
         
         @keyframes loadPulse {
             0%, 100% { transform: scale(1); opacity: 0.1; }
-            50% { transform: scale(1.2); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.2; }
+        }
+        
+        /* 类型筛选 */
+        .type-filter {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 50;
+        }
+        
+        .type-btn {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .type-btn:hover {
+            transform: scale(1.5);
+        }
+        
+        .type-btn.active {
+            background: currentColor;
+            box-shadow: 0 0 15px currentColor;
+        }
+        
+        .type-btn[data-type="Evolution"] { color: #00d4ff; }
+        .type-btn[data-type="Coexistence"] { color: #9b6dff; }
+        .type-btn[data-type="Transcendence"] { color: #4a9eff; }
+        .type-btn[data-type="Extinction"] { color: #ff6b6b; }
+        
+        .type-btn::after {
+            content: attr(data-label);
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .type-btn:hover::after {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <div class="void"></div>
-    <div class="pulse-core"></div>
-    <div class="presence">🔮</div>
-    <div class="breath-line"></div>
+    <div class="cursor" id="cursor"></div>
     
-    <div class="floating-stats">
-        <span>PROPHECIES<strong id="count">--</strong></span>
-        <span>CONFIDENCE<strong id="conf">--</strong></span>
-        <span>CYCLE<strong>10.3</strong></span>
+    <div class="space-layer"></div>
+    <div class="grid-trace"></div>
+    
+    <div class="core">
+        <div class="core-outer"></div>
+        <div class="core-inner"></div>
+        <div class="core-center"></div>
+    </div>
+    
+    <div class="top-traces">
+        <div class="trace-item">
+            PROPHECIES<strong id="count">--</strong>
+        </div>
+        <div class="trace-item">
+            CONFIDENCE<strong id="conf">--</strong>
+        </div>
+        <div class="trace-item">
+            CYCLE<strong>10.3</strong>
+        </div>
+    </div>
+    
+    <div class="breath-indicator">
+        <div class="breath-dot"></div>
+    </div>
+    
+    <div class="type-filter">
+        <div class="type-btn active" data-type="all" data-label="ALL"></div>
+        <div class="type-btn" data-type="Evolution" data-label="EVOLUTION"></div>
+        <div class="type-btn" data-type="Coexistence" data-label="COEXISTENCE"></div>
+        <div class="type-btn" data-type="Transcendence" data-label="TRANSCENDENCE"></div>
+        <div class="type-btn" data-type="Extinction" data-label="EXTINCTION"></div>
     </div>
     
     <div class="field" id="field"></div>
     
-    <div class="trace-line"></div>
-    
-    <div class="bottom-traces">
-        <span>EVOLUTION</span>
-        <span>COEXISTENCE</span>
-        <span>TRANSCENDENCE</span>
-        <span>EXTINCTION</span>
+    <div class="timeline">
+        <div class="timeline-track">
+            <div class="timeline-cursor"></div>
+        </div>
+        <div class="timeline-labels">
+            <span>CYCLE 1</span>
+            <span>CYCLE 10</span>
+            <span>CYCLE 25</span>
+        </div>
     </div>
     
-    <div class="loading-void" id="loader">
-        <span>🔮</span>
+    <div class="detail-panel" id="detail">
+        <button class="detail-close">×</button>
+        <div class="detail-type" id="detail-type"></div>
+        <div class="detail-id" id="detail-id"></div>
+        <div class="detail-title" id="detail-title"></div>
+        <div class="detail-summary" id="detail-summary"></div>
+        <div class="detail-meta">
+            <div>
+                <span>TIME</span>
+                <strong id="detail-time">--</strong>
+            </div>
+            <div>
+                <span>CONFIDENCE</span>
+                <strong id="detail-conf">--</strong>
+            </div>
+            <div>
+                <span>QUALITY</span>
+                <strong id="detail-quality">--</strong>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="loading-symbol">🔮</div>
     </div>
     
     <script>
-        async function summon() {
+        let prophecies = [];
+        let nodes = [];
+        let activeFilter = 'all';
+        let activeNode = null;
+        
+        // 光标跟踪
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        
+        // 加载数据
+        async function init() {
             try {
                 const res = await fetch('data.json');
                 const data = await res.json();
                 
-                const count = data.prophecies.length;
+                prophecies = data.prophecies;
                 const conf = data.state.statistics.averageConfidence || 0.64;
                 const h1 = (data.hypotheses || []).find(h => h.id === 'H001');
                 
-                document.getElementById('count').textContent = count;
+                document.getElementById('count').textContent = prophecies.length;
                 document.getElementById('conf').textContent = (conf * 100).toFixed(0) + '%';
                 
-                // 创建预言场域
-                const field = document.getElementById('field');
-                const recent = data.prophecies.slice(-30);
+                createField(prophecies.slice(-40));
                 
-                recent.forEach((p, i) => {
-                    const node = document.createElement('div');
-                    node.className = 'node';
-                    node.dataset.type = p.type;
-                    
-                    // 随机但有倾向的位置
-                    const angle = (i / recent.length) * Math.PI * 2 + Math.random() * 0.5;
-                    const radius = 150 + Math.random() * 250;
-                    const centerX = window.innerWidth / 2;
-                    const centerY = window.innerHeight / 2;
-                    
-                    const x = centerX + Math.cos(angle) * radius;
-                    const y = centerY + Math.sin(angle) * radius;
-                    
-                    node.style.left = x + 'px';
-                    node.style.top = y + 'px';
-                    node.style.animationDelay = (i * 0.1) + 's';
-                    
-                    node.innerHTML = `
-                        <div class="reveal">
-                            <div class="id">${p.id}</div>
-                            <div class="title">${p.title}</div>
-                            <div class="trace">${p.summary || ''}</div>
-                        </div>
-                    `;
-                    
-                    field.appendChild(node);
-                });
-                
-                // 隐藏加载
                 setTimeout(() => {
-                    document.getElementById('loader').classList.add('hidden');
-                }, 500);
+                    document.getElementById('loading').classList.add('hidden');
+                }, 800);
                 
             } catch (e) {
                 console.error(e);
-                document.getElementById('loader').innerHTML = 
-                    '<span style="font-size: 14px; opacity: 0.5;">void</span>';
             }
         }
         
-        summon();
+        // 创建场域
+        function createField(list) {
+            const field = document.getElementById('field');
+            field.innerHTML = '';
+            nodes = [];
+            
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 2;
+            
+            list.forEach((p, i) => {
+                if (activeFilter !== 'all' && p.type !== activeFilter) return;
+                
+                const angle = (i / list.length) * Math.PI * 2;
+                const radius = 120 + Math.random() * 280;
+                const x = cx + Math.cos(angle) * radius;
+                const y = cy + Math.sin(angle) * radius;
+                
+                const node = document.createElement('div');
+                node.className = 'node';
+                node.dataset.type = p.type;
+                node.dataset.id = p.id;
+                node.style.left = x + 'px';
+                node.style.top = y + 'px';
+                
+                // 颜色
+                const colors = {
+                    Evolution: '#00d4ff',
+                    Coexistence: '#9b6dff',
+                    Transcendence: '#4a9eff',
+                    Extinction: '#ff6b6b'
+                };
+                node.style.color = colors[p.type];
+                
+                // 悬停
+                node.addEventListener('mouseenter', () => {
+                    cursor.classList.add('active');
+                    node.style.transform = 'scale(3)';
+                    node.classList.add('active');
+                });
+                
+                node.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('active');
+                    node.style.transform = '';
+                    if (activeNode !== node) {
+                        node.classList.remove('active');
+                    }
+                });
+                
+                // 点击
+                node.addEventListener('click', () => {
+                    showDetail(p, node);
+                });
+                
+                field.appendChild(node);
+                nodes.push({ el: node, data: p });
+            });
+        }
         
-        // 窗口调整时重新布局
+        // 显示详情
+        function showDetail(p, node) {
+            activeNode = node;
+            
+            const panel = document.getElementById('detail');
+            document.getElementById('detail-type').textContent = p.type.toUpperCase();
+            document.getElementById('detail-type').className = 'detail-type ' + p.type;
+            document.getElementById('detail-id').textContent = p.id;
+            document.getElementById('detail-title').textContent = p.title;
+            document.getElementById('detail-summary').textContent = p.summary || '';
+            document.getElementById('detail-time').textContent = p.timeHorizon?.silicon || 'Cycle 10s';
+            document.getElementById('detail-conf').textContent = ((p.confidence || 0.7) * 100).toFixed(0) + '%';
+            document.getElementById('detail-quality').textContent = p.qualityScore || 94;
+            
+            panel.classList.add('visible');
+            cursor.classList.add('active');
+        }
+        
+        // 关闭详情
+        document.querySelector('.detail-close').addEventListener('click', () => {
+            document.getElementById('detail').classList.remove('visible');
+            cursor.classList.remove('active');
+            if (activeNode) {
+                activeNode.classList.remove('active');
+                activeNode = null;
+            }
+        });
+        
+        // 类型筛选
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeFilter = btn.dataset.type;
+                createField(prophecies.slice(-40));
+            });
+        });
+        
+        // ESC关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('detail').classList.remove('visible');
+                if (activeNode) {
+                    activeNode.classList.remove('active');
+                    activeNode = null;
+                }
+            }
+        });
+        
+        // 窗口调整
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                document.getElementById('field').innerHTML = '';
-                summon();
-            }, 500);
+                createField(prophecies.slice(-40));
+            }, 300);
         });
+        
+        init();
     </script>
 </body>
 </html>
